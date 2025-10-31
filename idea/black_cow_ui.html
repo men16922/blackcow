@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>쇼핑 흑우 감별사 – URL 분석 웹 UI (MVP)</title>
+  <style>
+    :root{
+      --bg:#0f1115;
+      --panel:#141821;
+      --panel-2:#0f141c;
+      --line:#1f2633;
+      --text:#e7ecf3;
+      --muted:#9aa6b2;
+      --brand:#f4c430;
+      --ok:#50d1a0;
+      --warn:#f59e0b;
+      --danger:#ef4444;
+      --radius:14px;
+      --radius-sm:10px;
+      --shadow:0 8px 24px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#0e1014,#0c0f14);
+      color:var(--text);
+      font:15px/1.5 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "맑은 고딕", sans-serif;
+    }
+    /* Header */
+    .app-header{
+      position:sticky; top:0; z-index:20;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 18px;
+      background:rgba(10,12,18,.75);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .brand{display:flex; gap:10px; align-items:center; font-weight:700}
+    .brand .logo{display:grid; place-items:center; width:34px; height:34px; border-radius:9px; background:var(--brand); color:#171717; font-weight:900}
+    .brand small{display:block; color:var(--muted); font-weight:600; letter-spacing:.2px}
+    .nav{display:flex; gap:14px; align-items:center; color:var(--muted)}
+    .nav a{color:inherit; text-decoration:none; padding:6px 10px; border-radius:8px}
+    .nav a:hover{background:#161b24;color:var(--text)}
+
+    /* Shell */
+    .shell{
+      height:calc(100vh - 64px);
+      display:grid;
+      grid-template-columns: 280px 1fr;
+      gap:0;
+    }
+    /* Sidebar */
+    .sidebar{
+      border-right:1px solid var(--line);
+      background:linear-gradient(180deg,#0e131b,#0f141c 20%);
+      padding:18px 14px;
+      overflow:auto;
+    }
+    .side-title{display:flex; justify-content:space-between; align-items:center; color:var(--muted); margin:6px 4px 12px; font-weight:600}
+    .history{
+      display:flex; flex-direction:column; gap:8px;
+    }
+    .hist-item{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      display:flex; gap:10px; align-items:flex-start;
+      cursor:pointer;
+    }
+    .hist-item:hover{border-color:#2a3446; background:#121722}
+    .hist-badge{width:28px; height:28px; border-radius:8px; display:grid; place-items:center; background:#1b2230; color:var(--brand); font-weight:800}
+    .hist-meta{font-size:12.5px; color:var(--muted)}
+    .side-actions{margin-top:14px; display:flex; gap:8px; flex-wrap:wrap}
+    .btn{
+      appearance:none; border:1px solid var(--line); background:#151a23; color:var(--text);
+      padding:8px 10px; border-radius:10px; cursor:pointer; font-weight:600;
+    }
+    .btn:hover{border-color:#2a3446; background:#121722}
+
+    /* Main */
+    .main{
+      display:flex; flex-direction:column; height:100%;
+    }
+    .toolbar{
+      padding:16px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg,#0e131b,#101621);
+    }
+    .inputbar{
+      display:grid; grid-template-columns: 1fr auto; gap:10px;
+      background:var(--panel); border:1px solid var(--line);
+      border-radius:var(--radius); padding:10px;
+      box-shadow:var(--shadow);
+    }
+    .inputbar input[type=url]{
+      width:100%; background:#0e131a; color:var(--text);
+      border:1px solid #1b2230; outline:none; padding:12px 14px;
+      border-radius:10px; font-size:15px;
+    }
+    .inputbar .primary{
+      background:var(--brand); color:#171717; border:none;
+      padding:12px 16px; border-radius:10px; font-weight:800; cursor:pointer;
+    }
+    .inputbar .primary:hover{filter:brightness(0.98)}
+
+    /* Workbench */
+    .work{
+      flex:1; overflow:auto; padding:18px;
+      display:grid; grid-template-columns: 1.1fr .9fr; gap:18px;
+    }
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:16px;
+      min-height:220px;
+      box-shadow:var(--shadow);
+    }
+    .panel h3{margin:0 0 10px; font-size:16px}
+    .muted{color:var(--muted)}
+
+    /* Progress */
+    .progress{
+      margin-top:8px;
+      height:12px; border-radius:999px;
+      background:#0f141c; border:1px solid #1e2736; overflow:hidden;
+    }
+    .progress > i{
+      display:block; height:100%; width:62%;
+      background:linear-gradient(90deg,var(--brand),#ffd86b);
+    }
+    .pill{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line); background:#101621; padding:6px 9px; border-radius:999px; color:var(--muted); font-weight:600;}
+
+    /* Results */
+    .cards{display:grid; gap:12px}
+    .card{
+      background:var(--panel-2);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px 12px 10px;
+    }
+    .card h4{margin:0 0 6px; font-size:14.5px; color:#e9eef7; letter-spacing:.2px}
+    .kvs{display:grid; gap:4px; color:var(--muted); font-size:14px}
+    .scorebar{
+      display:flex; align-items:center; gap:12px; margin:6px 0 4px;
+    }
+    .scorebar b{font-size:28px}
+    .meter{flex:1; height:10px; border-radius:999px; background:#0f141c; border:1px solid #1e2736; overflow:hidden}
+    .meter i{display:block; height:100%; width:78%; background:linear-gradient(90deg,var(--danger),#ffb199)}
+
+    .links{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+    .link{border:1px dashed #2c374a; color:#b9c4d2; padding:6px 8px; border-radius:8px; text-decoration:none}
+    .link:hover{background:#121722; border-style:solid}
+
+    /* Responsive */
+    @media (max-width:1080px){
+      .shell{grid-template-columns: 240px 1fr;}
+      .work{grid-template-columns:1fr; gap:14px}
+    }
+    @media (max-width:720px){
+      .shell{grid-template-columns: 1fr}
+      .sidebar{display:none}
+      .toolbar{position:sticky; top:64px; z-index:10}
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header" role="banner">
+    <div class="brand">
+      <div class="logo">🐄</div>
+      <div>
+        쇼핑 흑우 감별사
+        <small>URL 기반 AI 분석</small>
+      </div>
+    </div>
+    <nav class="nav" aria-label="주요 메뉴">
+      <a href="#" aria-current="page">홈</a>
+      <a href="#">도움말</a>
+      <a href="#">로그인</a>
+    </nav>
+  </header>
+
+  <div class="shell">
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="분석 기록">
+      <div class="side-title">
+        <span>🔗 최근 분석 기록</span>
+        <a class="btn" href="#">더보기</a>
+      </div>
+      <div class="history">
+        <div class="hist-item">
+          <div class="hist-badge">C</div>
+          <div>
+            <div>쿠팡 아이폰 15 프로</div>
+            <div class="hist-meta">https://www.coupang.com/... &middot; 3분 전</div>
+          </div>
+        </div>
+        <div class="hist-item">
+          <div class="hist-badge">N</div>
+          <div>
+            <div>네이버 에어팟 프로 2</div>
+            <div class="hist-meta">https://smartstore.naver.com/... &middot; 12분 전</div>
+          </div>
+        </div>
+        <div class="hist-item">
+          <div class="hist-badge">11</div>
+          <div>
+            <div>11번가 노트북</div>
+            <div class="hist-meta">https://www.11st.co.kr/... &middot; 어제</div>
+          </div>
+        </div>
+      </div>
+      <div class="side-actions">
+        <button class="btn">새 기록 폴더</button>
+        <button class="btn">설정</button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <!-- URL bar -->
+      <div class="toolbar">
+        <form class="inputbar" onsubmit="return false" aria-label="URL 분석 입력">
+          <input type="url" placeholder="분석할 쇼핑몰 링크를 붙여넣으세요 (예: https://www.coupang.com/...)" aria-label="URL 입력창" required />
+          <button class="primary" type="submit">분석하기</button>
+        </form>
+      </div>
+
+      <!-- Workbench -->
+      <section class="work">
+        <!-- Left: progress + summary -->
+        <section class="panel" aria-labelledby="analysis-title">
+          <h3 id="analysis-title">분석 상태</h3>
+          <div class="pill">🧠 AI 분석 중</div>
+          <div class="progress" aria-label="분석 진행률" aria-valuemin="0" aria-valuemax="100" aria-valuenow="62">
+            <i></i>
+          </div>
+
+          <div class="card" style="margin-top:14px">
+            <h4>요약</h4>
+            <div class="scorebar">
+              <b>82</b>
+              <div class="meter"><i></i></div>
+              <span class="muted">흑우 위험도 (높음)</span>
+            </div>
+            <div class="kvs">
+              <div>현재가 <b style="color:#e8eef9">149,000원</b> · 평균가 98,000원</div>
+              <div>판매자 신규 3주 · 반품정책 없음 · 해외배송</div>
+              <div>리뷰 반복 60% · 긍정비율 94%</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right: detailed cards -->
+        <section class="panel" aria-label="분석 결과 상세">
+          <h3>결과 리포트</h3>
+          <div class="cards">
+            <article class="card">
+              <h4>💰 가격 분석</h4>
+              <div class="kvs">
+                <div>현재가: 149,000원</div>
+                <div>시장 평균: 98,000원</div>
+                <div>이상치: +52% (MAD 기준)</div>
+              </div>
+            </article>
+
+            <article class="card">
+              <h4>📦 판매자 분석</h4>
+              <div class="kvs">
+                <div>계정 연령: 3주</div>
+                <div>반품 정책: 없음</div>
+                <div>배송 출발지: 해외</div>
+              </div>
+            </article>
+
+            <article class="card">
+              <h4>💬 리뷰 분석</h4>
+              <div class="kvs">
+                <div>동일 문장 반복: 60%</div>
+                <div>긍정 비율: 94% (감정 다양성 부족)</div>
+                <div>어뷰징 키워드: “정품, 공식, 최저가”</div>
+              </div>
+            </article>
+
+            <article class="card">
+              <h4>✅ 대안 제안</h4>
+              <div class="kvs">
+                <div>쿠팡 로켓배송 · 98,000원</div>
+                <div>네이버 공식스토어 · 99,500원</div>
+              </div>
+              <div class="links">
+                <a class="link" href="#">쿠팡 바로가기</a>
+                <a class="link" href="#">네이버 바로가기</a>
+              </div>
+            </article>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
