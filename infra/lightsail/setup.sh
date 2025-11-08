@@ -28,7 +28,7 @@ log_step() {
 INSTANCE_NAME=${INSTANCE_NAME:-"shopping-fraud-detector"}
 REGION=${AWS_REGION:-"ap-northeast-2"}
 BUNDLE_ID=${BUNDLE_ID:-"nano_2_0"}
-BLUEPRINT_ID=${BLUEPRINT_ID:-"nodejs_18"}
+BLUEPRINT_ID=${BLUEPRINT_ID:-"nodejs_20"}
 
 echo "======================================"
 echo "  AWS Lightsail Setup  "
@@ -74,7 +74,7 @@ set -e
 apt-get update
 apt-get upgrade -y
 
-# Node.js는 이미 설치되어 있음 (blueprint: nodejs_18)
+# Node.js는 이미 설치되어 있음 (blueprint: nodejs_20)
 
 # Install Yarn
 npm install -g yarn
