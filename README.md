@@ -5,7 +5,7 @@
 온라인 쇼핑몰 상품 링크를 분석하여 사기 위험도를 평가하고, 안전한 쇼핑을 돕는 웹 애플리케이션입니다.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
 [![AWS](https://img.shields.io/badge/AWS-Lightsail%20%7C%20DynamoDB%20%7C%20Bedrock-orange)](https://aws.amazon.com/)
 
 ## 📋 목차
