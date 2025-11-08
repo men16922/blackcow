@@ -987,7 +987,7 @@ provider "aws" {
 resource "aws_lightsail_instance" "app_server" {
   name              = "shopping-fraud-detector"
   availability_zone = "${var.aws_region}a"
-  blueprint_id      = "nodejs_16"
+  blueprint_id      = "nodejs_20"
   bundle_id         = "nano_2_0"
 
   tags = {
