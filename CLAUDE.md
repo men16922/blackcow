@@ -893,7 +893,7 @@ main
 **프론트엔드 Dockerfile** (`infra/docker/Dockerfile.client`)
 
 ```dockerfile
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -918,7 +918,7 @@ CMD ["nginx", "-g", "daemon off;"]
 **백엔드 Dockerfile** (`infra/docker/Dockerfile.server`)
 
 ```dockerfile
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -1099,7 +1099,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'yarn'
 
       - name: Install dependencies

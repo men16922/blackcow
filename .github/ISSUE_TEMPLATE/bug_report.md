@@ -54,7 +54,7 @@ assignees: ''
 
 **서버** (백엔드 버그인 경우):
 
-- Node.js Version: [예: 18.17.0]
+- Node.js Version: [예: 20.18.11]
 - 환경: [예: 로컬, AWS Lightsail]
 
 **기타**:

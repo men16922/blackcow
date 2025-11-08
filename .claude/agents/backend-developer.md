@@ -6,7 +6,7 @@
 
 ## 기술 스택
 
-- **런타임**: Node.js 18+
+- **런타임**: Node.js 20+
 - **프레임워크**: Express.js 4.x
 - **언어**: TypeScript
 - **데이터베이스**: AWS DynamoDB (로컬 & 프로덕션)

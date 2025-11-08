@@ -4,7 +4,7 @@ AWS 인프라를 코드로 관리하기 위한 Terraform 설정 파일들입니�
 
 ## 프로비저닝되는 리소스
 
-- AWS Lightsail 인스턴스 (Node.js 18)
+- AWS Lightsail 인스턴스 (Node.js 20)
 - Lightsail Static IP
 - DynamoDB 테이블 (Products, AnalysisHistory)
 - CloudWatch Log Group

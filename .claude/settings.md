@@ -8,8 +8,8 @@
 
 ### 기술 스택
 
-- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS
-- **Backend**: Node.js 18, Express, TypeScript
+- **Frontend**: React 20, TypeScript, Vite, Tailwind CSS
+- **Backend**: Node.js 20, Express, TypeScript
 - **Database**: AWS DynamoDB
 - **AI**: Claude API (Anthropic SDK)
 - **Monorepo**: Turborepo, Yarn Workspaces

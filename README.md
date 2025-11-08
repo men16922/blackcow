@@ -52,7 +52,7 @@
 
 ### Backend
 
-- **Runtime**: Node.js 18
+- **Runtime**: Node.js 20
 - **Framework**: Express 4.x
 - **Database**: AWS DynamoDB
 - **AI/ML**: AWS Bedrock Claude Sonnet 4.0 / Claude API
@@ -80,7 +80,7 @@
 
 ## 🏗 아키텍처
 
-![아키텍처 다이어그램](generated-diagrams/diagram_a88b46a7.png)
+![아키텍처 다이어그램](generated-diagrams/shopping_fraud_detector_architecture.png)
 
 ### 배포 구성
 
@@ -100,7 +100,7 @@
 
 ### 사전 요구사항
 
-- Node.js 18+
+- Node.js 20+
 - Docker & Docker Compose (로컬 개발 시)
 - AWS 계정 (프로덕션 배포 시)
 - Claude API Key (권장)

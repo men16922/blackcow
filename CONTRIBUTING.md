@@ -24,7 +24,7 @@
 
 ### 사전 요구사항
 
-- Node.js 18+
+- Node.js 20+
 - Yarn 1.22+
 - Git
 - Docker & Docker Compose (로컬 개발 시)

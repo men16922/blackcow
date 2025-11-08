@@ -32,7 +32,7 @@ provider "aws" {
 resource "aws_lightsail_instance" "app_server" {
   name              = "${var.project_name}-${var.environment}"
   availability_zone = "${var.aws_region}a"
-  blueprint_id      = "nodejs_18"
+  blueprint_id      = "nodejs_20"
   bundle_id         = var.lightsail_bundle_id
 
   # User data script for initial setup
