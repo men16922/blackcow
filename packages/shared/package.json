@@ -10,7 +10,8 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist node_modules",
     "lint": "eslint . --ext ts",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "yarn type-check"
   },
   "devDependencies": {
     "typescript": "^5.3.3"
