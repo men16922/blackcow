@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # Frontend (React)
+  client:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.client
+    container_name: shopping-fraud-detector-client
+    ports:
+      - "${CLIENT_PORT:-3001}:80"
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:3000}
+    depends_on:
+      - server
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Backend (Express)
+  server:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.server
+    container_name: shopping-fraud-detector-server
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=3000
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - DYNAMODB_ENDPOINT=http://dynamodb:8000
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    depends_on:
+      dynamodb:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - server-logs:/app/logs
+    networks:
+      - app-network
+
+  # DynamoDB Local
+  dynamodb:
+    image: amazon/dynamodb-local:latest
+    container_name: shopping-fraud-detector-dynamodb
+    ports:
+      - "${DYNAMODB_PORT:-8000}:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
+    volumes:
+      - dynamodb-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+  # DynamoDB Admin (Optional - for development)
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin:latest
+    container_name: shopping-fraud-detector-dynamodb-admin
+    ports:
+      - "${DYNAMODB_ADMIN_PORT:-8001}:8001"
+    environment:
+      - DYNAMO_ENDPOINT=http://dynamodb:8000
+      - AWS_REGION=local
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+    depends_on:
+      - dynamodb
+    restart: unless-stopped
+    networks:
+      - app-network
+    profiles:
+      - dev
+
+volumes:
+  dynamodb-data:
+    driver: local
+  server-logs:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # 로컬 DynamoDB
@@ -14,22 +14,6 @@ services:
       - shopping-fraud-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # 로컬 LLM (Ollama)
-  ollama:
-    image: ollama/ollama:latest
-    container_name: shopping-fraud-ollama-${USER:-dev}
-    ports:
-      - "${OLLAMA_PORT:-11434}:11434"
-    volumes:
-      - ./ollama-data-${USER:-dev}:/root/.ollama
-    networks:
-      - shopping-fraud-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5

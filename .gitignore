@@ -38,12 +38,19 @@ coverage/
 dist/
 build/
 *.tsbuildinfo
+.next/
+out/
+
+# Turborepo
+.turbo
 
 # React build
 client/build/
 
 # IDE
-.vscode/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
 .idea/
 *.swp
 *.swo
@@ -52,7 +59,6 @@ client/build/
 
 # Docker volumes (local development)
 dynamodb-data-*/
-ollama-data-*/
 
 # PM2
 .pm2/

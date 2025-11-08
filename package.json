@@ -1,0 +1,38 @@
+{
+  "name": "shopping-fraud-detector",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI 기반 온라인 쇼핑 사기 탐지 서비스",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"yarn workspace @shopping-fraud-detector/client dev\" \"yarn workspace @shopping-fraud-detector/server dev\"",
+    "build": "yarn workspace @shopping-fraud-detector/shared build && concurrently \"yarn workspace @shopping-fraud-detector/client build\" \"yarn workspace @shopping-fraud-detector/server build\"",
+    "test": "yarn workspaces run test",
+    "test:integration": "yarn workspaces run test:integration",
+    "test:e2e": "yarn workspaces run test:e2e",
+    "test:coverage": "yarn workspaces run test:coverage",
+    "lint": "yarn workspaces run lint",
+    "lint:fix": "yarn workspaces run lint --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "type-check": "yarn workspaces run type-check",
+    "clean": "yarn workspaces run clean && rm -rf node_modules",
+    "setup:local": "node scripts/setup-local.js",
+    "setup:dynamodb": "node scripts/setup-dynamodb.js",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prettier": "^3.1.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "packageManager": "yarn@1.22.19"
+}
