@@ -1,18 +1,18 @@
-import { Router } from 'express'
-import { createLogger } from '../utils/logger.js'
+import { Router } from 'express';
+import { createLogger } from '../utils/logger.js';
 
-const router = Router()
-const logger = createLogger()
+const router = Router();
+const logger = createLogger();
 
 router.post('/', async (req, res) => {
   try {
-    const { url } = req.body
+    const { url } = req.body;
 
     if (!url) {
-      return res.status(400).json({ error: 'URL is required' })
+      return res.status(400).json({ error: 'URL is required' });
     }
 
-    logger.info('Analyzing product:', { url })
+    logger.info('Analyzing product:', { url });
 
     // TODO: Implement actual analysis logic
     // This is a placeholder response
@@ -49,13 +49,13 @@ router.post('/', async (req, res) => {
       recommendations: [],
       analyzedAt: new Date().toISOString(),
       processingTime: 1000,
-    }
+    };
 
-    res.json(result)
+    res.json(result);
   } catch (error) {
-    logger.error('Analysis error:', error)
-    res.status(500).json({ error: 'Failed to analyze product' })
+    logger.error('Analysis error:', error);
+    res.status(500).json({ error: 'Failed to analyze product' });
   }
-})
+});
 
-export default router
+export default router;

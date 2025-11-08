@@ -6,6 +6,7 @@ description: Express API 라우트를 생성합니다 (TypeScript + Zod 검증)
 새로운 Express API 엔드포인트를 생성합니다.
 
 ## 생성 위치
+
 - `apps/server/src/routes/` 디렉토리
 
 ## 템플릿 구조
@@ -46,6 +47,7 @@ export default router;
 ```
 
 ## 체크리스트
+
 - [ ] Zod 스키마로 입력 검증
 - [ ] try-catch 에러 처리
 - [ ] Winston 로거 사용

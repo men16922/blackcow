@@ -51,6 +51,7 @@
 ## 🛠 기술 스택
 
 ### Backend
+
 - **Runtime**: Node.js 18
 - **Framework**: Express 4.x
 - **Database**: AWS DynamoDB
@@ -60,12 +61,14 @@
 - **Security**: Helmet, express-rate-limit
 
 ### Frontend
+
 - **Framework**: React 18
 - **Styling**: Tailwind CSS
 - **HTTP Client**: Axios
 - **Charts**: Chart.js (Phase 2)
 
 ### DevOps & Infrastructure
+
 - **Monorepo**: Yarn Workspaces
 - **IaC**: Terraform
 - **Container**: Docker, Docker Compose
@@ -267,6 +270,7 @@ terraform output
 Pull Request 생성 시 자동으로 코드 검증이 실행됩니다.
 
 **검증 항목:**
+
 - ESLint 린트 검사
 - Prettier 포맷 체크
 - TypeScript 타입 체크
@@ -371,6 +375,7 @@ shopping-fraud-detector/
 상품 URL을 분석하여 BRS 점수를 반환합니다.
 
 **Request:**
+
 ```json
 {
   "url": "https://www.coupang.com/vp/products/123456"
@@ -378,6 +383,7 @@ shopping-fraud-detector/
 ```
 
 **Response:**
+
 ```json
 {
   "brs": 65,
@@ -427,9 +433,11 @@ shopping-fraud-detector/
 대안 상품을 검색합니다.
 
 **Query Parameters:**
+
 - `productName`: 상품명 (required)
 
 **Response:**
+
 ```json
 {
   "alternatives": [
@@ -472,11 +480,13 @@ yarn test:coverage
 프로젝트는 Husky를 사용하여 Git Hooks를 관리합니다.
 
 **Pre-commit Hook**
+
 - ESLint로 코드 검사 및 자동 수정
 - Prettier로 코드 포맷팅
 - 변경된 파일만 검사 (lint-staged)
 
 **Commit-msg Hook**
+
 - Conventional Commits 형식 검증
 - 올바른 형식: `<type>(<scope>): <description>`
 

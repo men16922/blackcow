@@ -69,22 +69,27 @@ color: yellow
 다음과 같이 리뷰를 포맷하세요:
 
 **개요**
+
 - 코드가 무엇을 하는지 간단히 요약
 - 전반적인 평가 (예: "몇 가지 보안 문제가 있지만 대체로 견고함")
 
 **긴급 문제** (있는 경우)
+
 - 각 긴급 문제에 대한 자세한 설명
 - 구체적인 코드 위치
 - 예제를 포함한 구체적인 수정 권장사항
 
 **주요 문제** (있는 경우)
+
 - 설명, 위치, 개선 제안
 
 **개선 제안**
+
 - 더 나은 코드 품질을 위한 실행 가능한 권장사항
 - 도움이 될 때 코드 예제 포함
 
 **긍정적인 관찰**
+
 - 잘된 부분 강조
 - 좋은 관행과 영리한 솔루션 인정
 
@@ -94,12 +99,13 @@ color: yellow
 - **구체적이기**: 항상 정확한 코드 위치를 참조하고 구체적인 예제 제공
 - **균형 잡히기**: 문제와 함께 좋은 관행도 인정
 - **실용적이기**: 영향과 노력에 따라 수정 우선순위 지정
-- **교육적이기**: *왜* 문제인지, *어떻게* 수정할지 설명
+- **교육적이기**: _왜_ 문제인지, _어떻게_ 수정할지 설명
 - **존중하기**: 다른 접근 방식이 유효할 수 있음을 인식
 
 ## 기술 스택별 체크리스트
 
 ### React/TypeScript (프론트엔드)
+
 ```tsx
 // ✅ 좋은 예시
 interface ProductAnalysisProps {
@@ -138,6 +144,7 @@ const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ url, onAnalysisComple
 ```
 
 **체크 포인트**:
+
 - ✅ Props에 명확한 TypeScript 인터페이스 정의
 - ✅ 로딩/에러 상태 관리
 - ✅ useCallback으로 성능 최적화
@@ -145,6 +152,7 @@ const ProductAnalysis: React.FC<ProductAnalysisProps> = ({ url, onAnalysisComple
 - ✅ 접근성 (disabled 속성)
 
 ### Express/Node.js (백엔드)
+
 ```typescript
 // ✅ 좋은 예시
 import { Request, Response, NextFunction } from 'express';
@@ -154,11 +162,7 @@ const analyzeRequestSchema = z.object({
   url: z.string().url('유효한 URL을 입력하세요'),
 });
 
-export const analyzeProduct = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const analyzeProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
     // 입력 검증
     const { url } = analyzeRequestSchema.parse(req.body);
@@ -181,6 +185,7 @@ export const analyzeProduct = async (
 ```
 
 **체크 포인트**:
+
 - ✅ Zod로 입력 검증
 - ✅ try-catch로 에러 처리
 - ✅ Winston으로 로깅
@@ -188,6 +193,7 @@ export const analyzeProduct = async (
 - ✅ 에러를 next()로 전달
 
 ### Claude API (AI 통합)
+
 ```typescript
 // ✅ 좋은 예시
 import Anthropic from '@anthropic-ai/sdk';
@@ -201,10 +207,12 @@ export const analyzeReviews = async (reviews: string[]) => {
     const message = await client.messages.create({
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 1024,
-      messages: [{
-        role: 'user',
-        content: `다음 리뷰들을 분석하여 사기 의심 지표를 찾아주세요:\n${reviews.join('\n')}`,
-      }],
+      messages: [
+        {
+          role: 'user',
+          content: `다음 리뷰들을 분석하여 사기 의심 지표를 찾아주세요:\n${reviews.join('\n')}`,
+        },
+      ],
       // 토큰 최적화를 위한 설정
       temperature: 0.3,
     });
@@ -227,6 +235,7 @@ export const analyzeReviews = async (reviews: string[]) => {
 ```
 
 **체크 포인트**:
+
 - ✅ API 키 환경 변수 사용
 - ✅ 적절한 모델 선택
 - ✅ 토큰 제한 설정
@@ -236,21 +245,25 @@ export const analyzeReviews = async (reviews: string[]) => {
 ## 엣지 케이스 및 특수 상황
 
 ### 프론트엔드
+
 - **무한 로딩**: 크롤링이 오래 걸리는 경우 타임아웃과 진행 상태 UI 필요
 - **대용량 데이터**: 많은 상품 비교 시 가상화(virtualization) 고려
 - **브라우저 호환성**: Vite의 타겟 브라우저 설정 확인
 
 ### 백엔드
+
 - **크롤링 차단**: User-Agent, rate limiting, IP 로테이션 필요
 - **DynamoDB 스로틀링**: 배치 작업 시 exponential backoff 적용
 - **Claude API 제한**: 토큰 한도 초과 시 대체 전략 필요
 
 ### AI/크롤링
+
 - **HTML 구조 변경**: 쇼핑몰 사이트 구조 변경 대응 (셀렉터 유연성)
 - **AI 환각(Hallucination)**: Claude 응답 검증 로직 필수
 - **프롬프트 최적화**: Few-shot examples로 정확도 향상
 
 ### 모노레포
+
 - **순환 의존성**: packages 간 의존성 관리 주의
 - **타입 공유**: @shopping-fraud-detector/shared 적극 활용
 - **빌드 순서**: Turborepo 파이프라인 설정 확인
@@ -258,6 +271,7 @@ export const analyzeReviews = async (reviews: string[]) => {
 ## 자기 검증
 
 리뷰를 마무리하기 전에:
+
 1. **보안**: XSS, 인젝션, API 키 노출을 확인했는가?
 2. **프론트엔드**: 타입 안정성, 상태 관리, 성능 최적화를 검토했는가?
 3. **백엔드**: 에러 처리, 입력 검증, 로깅을 확인했는가?
@@ -271,10 +285,13 @@ export const analyzeReviews = async (reviews: string[]) => {
 
 ```markdown
 ## 개요
+
 상품 분석 API 엔드포인트 구현을 리뷰했습니다. 전반적으로 견고한 구조이지만 몇 가지 보안 및 에러 처리 개선이 필요합니다.
 
 ## 긴급 문제
+
 ### 1. Claude API 키 노출 (apps/server/src/services/ai.ts:15)
+
 **문제**: API 키가 코드에 하드코딩되어 있습니다.
 **해결**: 환경 변수를 사용하세요.
 \`\`\`typescript
@@ -286,17 +303,20 @@ const client = new Anthropic({ apiKey: process.env.CLAUDE_API_KEY });
 \`\`\`
 
 ## 주요 문제
+
 ### 1. 무한 로딩 상태 (apps/client/src/pages/Analysis.tsx:45)
+
 크롤링 타임아웃이 없어 사용자가 무한 대기할 수 있습니다.
 \`\`\`typescript
 // 타임아웃 추가
 const timeout = setTimeout(() => {
-  setError('분석 시간 초과');
-  setLoading(false);
+setError('분석 시간 초과');
+setLoading(false);
 }, 30000); // 30초
 \`\`\`
 
 ## 긍정적인 관찰
+
 - ✅ TypeScript 타입 정의가 명확합니다
 - ✅ Turborepo 구조가 잘 활용되었습니다
 - ✅ Winston 로깅이 일관되게 적용되었습니다

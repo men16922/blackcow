@@ -1,31 +1,31 @@
-import { Router } from 'express'
-import { createLogger } from '../utils/logger.js'
+import { Router } from 'express';
+import { createLogger } from '../utils/logger.js';
 
-const router = Router()
-const logger = createLogger()
+const router = Router();
+const logger = createLogger();
 
 router.get('/', async (req, res) => {
   try {
-    const { productName } = req.query
+    const { productName } = req.query;
 
     if (!productName || typeof productName !== 'string') {
-      return res.status(400).json({ error: 'Product name is required' })
+      return res.status(400).json({ error: 'Product name is required' });
     }
 
-    logger.info('Searching alternatives:', { productName })
+    logger.info('Searching alternatives:', { productName });
 
     // TODO: Implement actual alternatives search
     // This is a placeholder response
     const result = {
       alternatives: [],
       sortedBy: 'price_asc',
-    }
+    };
 
-    res.json(result)
+    res.json(result);
   } catch (error) {
-    logger.error('Alternatives search error:', error)
-    res.status(500).json({ error: 'Failed to search alternatives' })
+    logger.error('Alternatives search error:', error);
+    res.status(500).json({ error: 'Failed to search alternatives' });
   }
-})
+});
 
-export default router
+export default router;

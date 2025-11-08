@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import HomePage from './pages/HomePage'
-import AnalysisPage from './pages/AnalysisPage'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import AnalysisPage from './pages/AnalysisPage';
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
         </Routes>
       </div>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;

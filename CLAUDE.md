@@ -7,10 +7,12 @@ AI 기반 온라인 쇼핑 사기 탐지 서비스입니다. 상품 URL을 분�
 ## 기술 스택
 
 ### 모노레포 관리
+
 - **Yarn Workspaces**: 패키지 의존성 관리
 - **concurrently**: 병렬 실행 도구
 
 ### 프론트엔드 (apps/client)
+
 - **React 18**: UI 라이브러리
 - **TypeScript**: 타입 안정성
 - **Vite**: 빌드 도구 및 개발 서버
@@ -19,6 +21,7 @@ AI 기반 온라인 쇼핑 사기 탐지 서비스입니다. 상품 URL을 분�
 - **Axios**: HTTP 클라이언트
 
 ### 백엔드 (apps/server)
+
 - **Node.js 20.18.1+**: 런타임
 - **Express**: 웹 프레임워크
 - **TypeScript**: 타입 안정성
@@ -30,6 +33,7 @@ AI 기반 온라인 쇼핑 사기 탐지 서비스입니다. 상품 URL을 분�
 - **Cheerio**: HTML 파싱 및 크롤링
 
 ### 공유 패키지 (packages/)
+
 - **@shopping-fraud-detector/shared**: 공통 타입 및 유틸리티
 
 ## 프로젝트 구조
@@ -174,6 +178,7 @@ yarn workspaces run lint
 ## 주요 기능 구현 상태
 
 ### Phase 1 (MVP) - 🚧 진행 중
+
 - ✅ 프로젝트 구조 세팅 (Turborepo)
 - ⏳ 상품 크롤링 (쿠팡, 네이버쇼핑, 11번가)
 - ⏳ 가격 분석 (Median + MAD 기반 이상치 탐지)
@@ -183,12 +188,14 @@ yarn workspaces run lint
 - ⏳ 대안 상품 추천
 
 ### Phase 2 - 📋 계획
+
 - AI 추천 코멘트
 - 리뷰 감정 지도
 - 위험 키워드 감지
 - 리스크 타임라인
 
 ### Phase 3 - 📋 계획
+
 - 상품 비교 기능
 - PDF 리포트 생성
 - 사용자 참여형 DB
@@ -196,9 +203,11 @@ yarn workspaces run lint
 ## API 엔드포인트
 
 ### POST /api/analyze
+
 상품 URL을 분석하여 BRS 점수 반환
 
 **Request:**
+
 ```json
 {
   "url": "https://www.coupang.com/vp/products/123456"
@@ -206,6 +215,7 @@ yarn workspaces run lint
 ```
 
 **Response:**
+
 ```json
 {
   "brs": 65,
@@ -219,9 +229,11 @@ yarn workspaces run lint
 ```
 
 ### GET /api/alternatives
+
 대안 상품 검색
 
 **Query Parameters:**
+
 - `productName`: 상품명 (required)
 
 ## 코딩 가이드라인
@@ -229,12 +241,14 @@ yarn workspaces run lint
 ### TypeScript
 
 **기본 원칙**
+
 - 모든 코드는 TypeScript로 작성
 - `any` 타입 사용 지양 (`unknown` 사용 권장)
 - 공통 타입은 `packages/shared/src/types`에 정의
 - 엄격 모드 활성화 (`strict: true`)
 
 **타입 정의**
+
 ```typescript
 // ✅ 좋은 예시
 interface Product {
@@ -248,12 +262,13 @@ type AnalysisStatus = 'pending' | 'analyzing' | 'completed' | 'failed';
 
 // ❌ 나쁜 예시
 interface Product {
-  id: any;  // any 사용 지양
-  data: object;  // 구체적인 타입 명시 필요
+  id: any; // any 사용 지양
+  data: object; // 구체적인 타입 명시 필요
 }
 ```
 
 **제네릭 활용**
+
 ```typescript
 // API 응답 타입
 interface ApiResponse<T> {
@@ -267,6 +282,7 @@ const response: ApiResponse<AnalysisResult> = await analyzeProduct(url);
 ```
 
 **유틸리티 타입 활용**
+
 ```typescript
 type PartialProduct = Partial<Product>;
 type ReadonlyProduct = Readonly<Product>;
@@ -276,6 +292,7 @@ type ProductKeys = keyof Product;
 ### 네이밍 컨벤션
 
 **파일 및 디렉토리**
+
 ```
 apps/client/src/
 ├── components/
@@ -302,6 +319,7 @@ apps/client/src/
 ```
 
 **변수 및 함수**
+
 ```typescript
 // ✅ 좋은 예시
 
@@ -316,34 +334,37 @@ const MAX_RETRY_COUNT = 3;
 const DEFAULT_TIMEOUT = 5000;
 
 // 함수: camelCase (동사로 시작)
-function analyzeProduct(url: string) { }
-function calculateBRS(data: ProductData) { }
-async function fetchProductData(id: string) { }
+function analyzeProduct(url: string) {}
+function calculateBRS(data: ProductData) {}
+async function fetchProductData(id: string) {}
 
 // Boolean 변수/함수: is/has/should 접두사
 const isValid = true;
 const hasError = false;
-function shouldRetry() { return true; }
+function shouldRetry() {
+  return true;
+}
 
 // 이벤트 핸들러: handle 접두사
-function handleSubmit(e: Event) { }
-function handleProductClick(id: string) { }
+function handleSubmit(e: Event) {}
+function handleProductClick(id: string) {}
 
 // ❌ 나쁜 예시
-const ProductList = [];  // 변수는 camelCase
-const api_url = '';      // camelCase 사용
-function AnalyzeProduct() { }  // 함수는 camelCase
+const ProductList = []; // 변수는 camelCase
+const api_url = ''; // camelCase 사용
+function AnalyzeProduct() {} // 함수는 camelCase
 ```
 
 **타입 및 인터페이스**
+
 ```typescript
 // PascalCase
-interface ProductAnalysis { }
-type AnalysisResult = { };
+interface ProductAnalysis {}
+type AnalysisResult = {};
 enum RiskLevel {
   LOW = 'LOW',
   MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH'
+  HIGH = 'HIGH',
 }
 
 // Props 타입: 컴포넌트명 + Props
@@ -354,6 +375,7 @@ interface ProductCardProps {
 ```
 
 **클래스**
+
 ```typescript
 // PascalCase
 class ProductAnalyzer {
@@ -372,6 +394,7 @@ class ProductAnalyzer {
 ### 코드 스타일
 
 **Prettier 설정** (`.prettierrc`)
+
 ```json
 {
   "semi": true,
@@ -385,6 +408,7 @@ class ProductAnalyzer {
 ```
 
 **ESLint 규칙**
+
 - `no-console`: warn (프로덕션에서는 logger 사용)
 - `no-unused-vars`: error
 - `@typescript-eslint/no-explicit-any`: error
@@ -392,6 +416,7 @@ class ProductAnalyzer {
 - `react-hooks/exhaustive-deps`: warn
 
 **Import 순서**
+
 ```typescript
 // 1. External dependencies
 import React, { useState, useEffect } from 'react';
@@ -411,6 +436,7 @@ import './styles.css';
 ```
 
 **주석 작성**
+
 ```typescript
 /**
  * 상품 URL을 분석하여 BRS 점수를 계산합니다.
@@ -424,16 +450,13 @@ import './styles.css';
  * const result = await analyzeProduct('https://example.com/product/123');
  * console.log(result.brs); // 65
  */
-async function analyzeProduct(
-  url: string,
-  options?: AnalysisOptions
-): Promise<AnalysisResult> {
+async function analyzeProduct(url: string, options?: AnalysisOptions): Promise<AnalysisResult> {
   // 구현...
 }
 
 // ✅ 복잡한 로직에는 설명 주석
 // BRS 점수는 가격(40%), 판매자(30%), 리뷰(30%) 가중치로 계산
-const brs = (priceScore * 0.4) + (sellerScore * 0.3) + (reviewScore * 0.3);
+const brs = priceScore * 0.4 + sellerScore * 0.3 + reviewScore * 0.3;
 
 // ❌ 자명한 코드에는 주석 불필요
 // i를 1 증가시킴
@@ -441,6 +464,7 @@ i++;
 ```
 
 **함수 길이 및 복잡도**
+
 - 함수는 한 가지 일만 수행 (Single Responsibility)
 - 최대 50줄 이하 권장
 - 중첩된 if 문은 3단계 이하
@@ -470,6 +494,7 @@ async function analyzeProduct(url: string): Promise<AnalysisResult> {
 ### React 컴포넌트 작성 가이드
 
 **컴포넌트 구조**
+
 ```tsx
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Product } from '@shopping-fraud-detector/shared';
@@ -484,11 +509,7 @@ interface ProductCardProps {
 /**
  * 상품 정보를 표시하는 카드 컴포넌트
  */
-export const ProductCard: React.FC<ProductCardProps> = ({
-  product,
-  onSelect,
-  className = '',
-}) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect, className = '' }) => {
   // State
   const [isHovered, setIsHovered] = useState(false);
 
@@ -518,6 +539,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 ```
 
 **Hooks 사용 규칙**
+
 ```typescript
 // ✅ 좋은 예시
 const [count, setCount] = useState(0);
@@ -547,6 +569,7 @@ useEffect(() => {
 ### 에러 처리
 
 **프론트엔드**
+
 ```typescript
 try {
   const result = await api.analyzeProduct(url);
@@ -566,6 +589,7 @@ try {
 ```
 
 **백엔드**
+
 ```typescript
 import { Request, Response, NextFunction } from 'express';
 
@@ -582,12 +606,7 @@ class ApiError extends Error {
 }
 
 // 에러 핸들러 미들웨어
-export const errorHandler = (
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof ApiError) {
     return res.status(err.statusCode).json({
       success: false,
@@ -607,6 +626,7 @@ export const errorHandler = (
 ### 환경 변수 관리
 
 **타입 안전한 환경 변수**
+
 ```typescript
 // apps/server/src/config/env.ts
 import { z } from 'zod';
@@ -641,6 +661,7 @@ chore: 빌드 프로세스 또는 도구 변경
 ```
 
 예시:
+
 ```
 feat(server): 상품 크롤링 기능 구현
 fix(client): 분석 결과 페이지 렌더링 오류 수정
@@ -706,6 +727,7 @@ scripts/
 ### 스크립트 작성 가이드
 
 **배포 스크립트 예시** (`scripts/deploy.sh`)
+
 ```bash
 #!/bin/bash
 set -e  # 에러 발생 시 즉시 종료
@@ -777,6 +799,7 @@ main "$@"
 ```
 
 **데이터베이스 초기화** (`scripts/setup-db.sh`)
+
 ```bash
 #!/bin/bash
 set -e
@@ -813,6 +836,7 @@ create_tables
 ```
 
 **헬스체크** (`scripts/health-check.sh`)
+
 ```bash
 #!/bin/bash
 
@@ -867,6 +891,7 @@ main
 ### Docker 설정
 
 **프론트엔드 Dockerfile** (`infra/docker/Dockerfile.client`)
+
 ```dockerfile
 FROM node:18-alpine AS builder
 
@@ -891,6 +916,7 @@ CMD ["nginx", "-g", "daemon off;"]
 ```
 
 **백엔드 Dockerfile** (`infra/docker/Dockerfile.server`)
+
 ```dockerfile
 FROM node:18-alpine
 
@@ -923,6 +949,7 @@ CMD ["node", "apps/server/dist/index.js"]
 ```
 
 **Docker Compose** (`infra/docker/docker-compose.yml`)
+
 ```yaml
 version: '3.8'
 
@@ -932,7 +959,7 @@ services:
       context: ../..
       dockerfile: infra/docker/Dockerfile.client
     ports:
-      - "3001:80"
+      - '3001:80'
     environment:
       - VITE_API_URL=http://localhost:3000
     depends_on:
@@ -943,7 +970,7 @@ services:
       context: ../..
       dockerfile: infra/docker/Dockerfile.server
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -956,8 +983,8 @@ services:
   dynamodb:
     image: amazon/dynamodb-local:latest
     ports:
-      - "8000:8000"
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
+      - '8000:8000'
+    command: '-jar DynamoDBLocal.jar -sharedDb -dbPath /data'
     volumes:
       - dynamodb-data:/data
     restart: unless-stopped
@@ -969,6 +996,7 @@ volumes:
 ### Terraform 설정 (선택사항)
 
 **메인 설정** (`infra/terraform/main.tf`)
+
 ```hcl
 terraform {
   required_providers {
@@ -1026,6 +1054,7 @@ resource "aws_dynamodb_table" "products" {
 ```
 
 **변수 정의** (`infra/terraform/variables.tf`)
+
 ```hcl
 variable "aws_region" {
   description = "AWS region"
@@ -1049,6 +1078,7 @@ variable "claude_api_key" {
 ### GitHub Actions 워크플로우
 
 **CI/CD 파이프라인** (`.github/workflows/deploy.yml`)
+
 ```yaml
 name: Deploy
 
@@ -1107,6 +1137,7 @@ chmod +x scripts/*.sh
 ### 환경별 설정
 
 **개발 환경** (`.env.development`)
+
 ```bash
 NODE_ENV=development
 PORT=3000
@@ -1117,6 +1148,7 @@ LOG_LEVEL=debug
 ```
 
 **프로덕션 환경** (`.env.production`)
+
 ```bash
 NODE_ENV=production
 PORT=3000
@@ -1186,6 +1218,7 @@ yarn workspace @shopping-fraud-detector/shared build
 브랜치 명명 규칙: `<type>/<description>`
 
 **기능 개발**
+
 ```bash
 feature/<기능명>
 # 예시:
@@ -1193,11 +1226,13 @@ feature/product-crawling
 feature/brs-calculation
 feature/ai-review-analysis
 ```
+
 - `develop`에서 분기
 - `develop`으로 머지
 - 완료 후 브랜치 삭제
 
 **버그 수정**
+
 ```bash
 fix/<버그명>
 # 예시:
@@ -1205,11 +1240,13 @@ fix/login-error
 fix/dynamodb-query
 fix/infinite-loading
 ```
+
 - `develop`에서 분기 (일반 버그)
 - `main`에서 분기 (핫픽스)
 - 원래 브랜치로 머지
 
 **리팩토링**
+
 ```bash
 refactor/<대상>
 # 예시:
@@ -1218,6 +1255,7 @@ refactor/component-hierarchy
 ```
 
 **문서 작업**
+
 ```bash
 docs/<문서명>
 # 예시:
@@ -1226,6 +1264,7 @@ docs/deployment
 ```
 
 **실험/연구**
+
 ```bash
 experiment/<실험명>
 # 예시:
@@ -1236,6 +1275,7 @@ experiment/review-sentiment
 #### 브랜치 작업 흐름
 
 **1. 새 기능 시작**
+
 ```bash
 # develop 최신화
 git checkout develop
@@ -1253,6 +1293,7 @@ git push -u origin feature/product-crawling
 ```
 
 **2. 중간 동기화** (작업이 오래 걸리는 경우)
+
 ```bash
 # develop의 최신 변경사항 가져오기
 git checkout develop
@@ -1265,6 +1306,7 @@ git push origin feature/product-crawling
 ```
 
 **3. PR 생성 및 머지**
+
 - GitHub에서 PR 생성
 - PR 템플릿에 따라 내용 작성
 - CI/CD 테스트 통과 확인
@@ -1273,6 +1315,7 @@ git push origin feature/product-crawling
 - 브랜치 삭제
 
 **4. 릴리스** (main에 배포)
+
 ```bash
 # develop에서 release 브랜치 생성
 git checkout develop
@@ -1294,6 +1337,7 @@ git branch -d release/v1.0.0
 ```
 
 **5. 핫픽스** (긴급 버그 수정)
+
 ```bash
 # main에서 hotfix 브랜치 생성
 git checkout main
@@ -1316,6 +1360,7 @@ git branch -d hotfix/critical-security-fix
 ### Pull Request 가이드
 
 #### PR 생성 전 체크리스트
+
 ```bash
 # 1. 로컬 테스트 실행
 yarn lint
@@ -1339,6 +1384,7 @@ git diff develop
    - PR 템플릿 자동 로드
 
 2. **제목 작성**
+
    ```
    [FEAT] 상품 크롤링 기능 구현
    [FIX] 로그인 에러 수정
@@ -1372,6 +1418,7 @@ git diff develop
 #### PR 리뷰 가이드
 
 **리뷰어로서**:
+
 - 코드 변경 사항을 꼼꼼히 확인
 - 프로젝트 코딩 가이드라인 준수 확인
 - 보안 취약점 확인
@@ -1380,6 +1427,7 @@ git diff develop
 - Approve 또는 Request Changes
 
 **리뷰 우선순위**:
+
 1. 🚨 보안: API 키 노출, 인젝션 취약점
 2. 🐛 버그: 논리 오류, 타입 에러
 3. 🎯 기능: 요구사항 충족 여부
@@ -1390,12 +1438,14 @@ git diff develop
 ### 커밋 규칙
 
 #### 커밋 메시지 주의사항
+
 - 한 커밋에 한 가지 변경사항만 포함
 - 50자 이내의 간결한 제목
 - 필요시 본문에 상세 설명 추가
 - 이슈 번호 참조 (예: `Closes #123`)
 
 #### 나쁜 커밋 예시
+
 ```bash
 ❌ git commit -m "수정"
 ❌ git commit -m "update"
@@ -1403,6 +1453,7 @@ git diff develop
 ```
 
 #### 좋은 커밋 예시
+
 ```bash
 ✅ git commit -m "feat(server): 쿠팡 상품 크롤러 구현"
 ✅ git commit -m "fix(client): 무한 로딩 상태 수정"

@@ -174,14 +174,14 @@ interface Product {
 
 ### 네이밍 컨벤션
 
-| 대상 | 규칙 | 예시 |
-|------|------|------|
-| 파일 (컴포넌트) | PascalCase | `ProductCard.tsx` |
-| 파일 (유틸리티) | kebab-case | `api-client.ts` |
-| 변수/함수 | camelCase | `analyzeProduct` |
-| 상수 | UPPER_SNAKE_CASE | `API_BASE_URL` |
-| 타입/인터페이스 | PascalCase | `AnalysisResult` |
-| Boolean | is/has/should 접두사 | `isLoading`, `hasError` |
+| 대상            | 규칙                 | 예시                    |
+| --------------- | -------------------- | ----------------------- |
+| 파일 (컴포넌트) | PascalCase           | `ProductCard.tsx`       |
+| 파일 (유틸리티) | kebab-case           | `api-client.ts`         |
+| 변수/함수       | camelCase            | `analyzeProduct`        |
+| 상수            | UPPER_SNAKE_CASE     | `API_BASE_URL`          |
+| 타입/인터페이스 | PascalCase           | `AnalysisResult`        |
+| Boolean         | is/has/should 접두사 | `isLoading`, `hasError` |
 
 ### React 컴포넌트
 
@@ -195,21 +195,14 @@ interface ProductCardProps {
   onSelect?: (id: string) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
-  product,
-  onSelect
-}) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = useCallback(() => {
     onSelect?.(product.id);
   }, [onSelect, product.id]);
 
-  return (
-    <div onClick={handleClick}>
-      {/* ... */}
-    </div>
-  );
+  return <div onClick={handleClick}>{/* ... */}</div>;
 };
 ```
 
@@ -224,11 +217,7 @@ const analyzeRequestSchema = z.object({
   url: z.string().url(),
 });
 
-export const analyzeProduct = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const analyzeProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { url } = analyzeRequestSchema.parse(req.body);
     const result = await productAnalysisService.analyze(url);
@@ -279,16 +268,16 @@ try {
 
 ### 커밋 타입
 
-| 타입 | 설명 | 예시 |
-|------|------|------|
-| `feat` | 새로운 기능 | `feat(client): add product search` |
-| `fix` | 버그 수정 | `fix(server): resolve DB connection issue` |
-| `docs` | 문서 변경 | `docs: update README` |
-| `style` | 코드 스타일 (포맷팅) | `style: apply prettier` |
-| `refactor` | 리팩토링 | `refactor(api): simplify error handling` |
-| `test` | 테스트 추가/수정 | `test(server): add unit tests` |
-| `chore` | 빌드/도구 변경 | `chore: update dependencies` |
-| `perf` | 성능 개선 | `perf(client): optimize rendering` |
+| 타입       | 설명                 | 예시                                       |
+| ---------- | -------------------- | ------------------------------------------ |
+| `feat`     | 새로운 기능          | `feat(client): add product search`         |
+| `fix`      | 버그 수정            | `fix(server): resolve DB connection issue` |
+| `docs`     | 문서 변경            | `docs: update README`                      |
+| `style`    | 코드 스타일 (포맷팅) | `style: apply prettier`                    |
+| `refactor` | 리팩토링             | `refactor(api): simplify error handling`   |
+| `test`     | 테스트 추가/수정     | `test(server): add unit tests`             |
+| `chore`    | 빌드/도구 변경       | `chore: update dependencies`               |
+| `perf`     | 성능 개선            | `perf(client): optimize rendering`         |
 
 ### Scope 예시
 
@@ -370,6 +359,7 @@ PR을 생성하면 자동으로 템플릿이 로드됩니다. 다음 항목을 �
 버그를 발견하셨나요? [Issue 생성](../../issues/new?template=bug_report.md)
 
 **포함할 내용:**
+
 - 버그 설명
 - 재현 방법
 - 예상 동작 vs 실제 동작
@@ -381,6 +371,7 @@ PR을 생성하면 자동으로 템플릿이 로드됩니다. 다음 항목을 �
 새로운 기능을 제안하고 싶으신가요? [Issue 생성](../../issues/new?template=feature_request.md)
 
 **포함할 내용:**
+
 - 기능 설명
 - 해결하려는 문제
 - 제안하는 해결 방법

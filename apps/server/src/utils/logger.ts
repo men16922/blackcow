@@ -1,4 +1,4 @@
-import winston from 'winston'
+import winston from 'winston';
 
 export const createLogger = () => {
   return winston.createLogger({
@@ -10,11 +10,8 @@ export const createLogger = () => {
     ),
     transports: [
       new winston.transports.Console({
-        format: winston.format.combine(
-          winston.format.colorize(),
-          winston.format.simple()
-        ),
+        format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
       }),
     ],
-  })
-}
+  });
+};

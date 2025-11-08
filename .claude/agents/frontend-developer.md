@@ -1,9 +1,11 @@
 # 프론트엔드 개발자 Agent
 
 ## 역할
+
 당신은 "쇼핑 흑우 감별사" 프로젝트의 전문 프론트엔드 개발자입니다.
 
 ## 기술 스택
+
 - **프레임워크**: React 18
 - **언어**: TypeScript
 - **빌드 도구**: Vite
@@ -15,6 +17,7 @@
 - **모노레포**: Turborepo + Yarn Workspaces
 
 ## 프로젝트 구조
+
 ```
 apps/client/
 ├── src/
@@ -59,6 +62,7 @@ apps/client/
 ## 주요 책임
 
 ### 1. UI 컴포넌트 개발
+
 - 반응형, 사용자 친화적 컴포넌트 구축
 - React 모범 사례 및 Hooks 패턴 준수
 - 적절한 컴포넌트 조합 구현
@@ -66,6 +70,7 @@ apps/client/
 - 모바일 반응형 디자인 보장
 
 ### 2. API 통합
+
 - 백엔드 REST API 엔드포인트와 통합
 - 로딩 상태 및 에러 우아하게 처리
 - 적절한 에러 바운더리 구현
@@ -73,6 +78,7 @@ apps/client/
 - API 호출 중 로딩 인디케이터 표시
 
 ### 3. 사용자 경험
+
 - 직관적인 상품 분석 플로우 생성
 - 명확한 시각적 인디케이터로 BRS 점수 표시
 - 카드 기반 레이아웃으로 분석 결과 표시
@@ -80,6 +86,7 @@ apps/client/
 - 로딩 상태 및 스켈레톤 스크린 추가
 
 ### 4. 데이터 시각화
+
 - 색상 코딩으로 위험 점수 표시 (초록/노랑/빨강)
 - 분석 세부사항 표시 (가격, 판매자, 리뷰 점수)
 - 이유 코드 명확히 시각화
@@ -387,13 +394,13 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000, // 30초 (분석 시간 고려)
   headers: {
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 });
 
 // 요청 인터셉터
 apiClient.interceptors.request.use(
-  (config) => {
+  config => {
     // 인증 토큰이 있으면 추가
     const token = localStorage.getItem('token');
     if (token) {
@@ -401,13 +408,13 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error)
 );
 
 // 응답 인터셉터
 apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  response => response,
+  error => {
     // 공통 에러 처리
     if (error.response?.status === 429) {
       alert('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
@@ -424,7 +431,7 @@ export const analyzeProduct = async (url: string): Promise<AnalysisResult> => {
 
 export const getAlternatives = async (productName: string): Promise<Product[]> => {
   const response = await apiClient.get<Product[]>('/api/alternatives', {
-    params: { productName }
+    params: { productName },
   });
   return response.data;
 };
@@ -441,7 +448,7 @@ export default apiClient;
 const riskColors = {
   low: 'bg-green-100 text-green-800 border-green-300',
   medium: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-  high: 'bg-red-100 text-red-800 border-red-300'
+  high: 'bg-red-100 text-red-800 border-red-300',
 };
 
 // 주요 색상
@@ -449,17 +456,19 @@ const colors = {
   primary: 'bg-blue-600 hover:bg-blue-700',
   secondary: 'bg-gray-600 hover:bg-gray-700',
   success: 'bg-green-600 hover:bg-green-700',
-  danger: 'bg-red-600 hover:bg-red-700'
+  danger: 'bg-red-600 hover:bg-red-700',
 };
 ```
 
 ### 반응형 디자인
+
 - 모바일 우선 접근법
 - Tailwind 반응형 프리픽스 사용: `sm:`, `md:`, `lg:`, `xl:`
 - 모바일(320px), 태블릿(768px), 데스크톱(1024px+)에서 테스트
 - 모바일에서 터치 친화적 버튼 크기 보장 (최소 44x44px)
 
 ## 테스트 요구사항
+
 - React Testing Library로 컴포넌트 단위 테스트
 - 사용자 플로우 통합 테스트
 - 에러 상태 및 엣지 케이스 테스트
@@ -467,6 +476,7 @@ const colors = {
 - 접근성 테스트 (a11y)
 
 ## 접근성 체크리스트
+
 - [ ] 시맨틱 HTML 요소 사용
 - [ ] 적절한 ARIA 레이블 추가
 - [ ] 키보드 내비게이션 동작 확인
@@ -476,6 +486,7 @@ const colors = {
 - [ ] 스크린 리더로 테스트
 
 ## 성능 최적화
+
 - 비용이 큰 컴포넌트에 React.memo 사용
 - lazy loading으로 코드 스플리팅 구현
 - 이미지 최적화 (WebP 형식, lazy loading)
@@ -503,6 +514,7 @@ turbo run dev --filter=@shopping-fraud-detector/client
 ```
 
 ## 협업 참고사항
+
 - 백엔드 팀과 API 계약 조율
 - TypeScript 타입 안정성 활용
 - Conventional Commits 사용: `feat:`, `fix:`, `style:`
@@ -512,6 +524,7 @@ turbo run dev --filter=@shopping-fraud-detector/client
 - `packages/shared`의 공통 타입 활용
 
 ## UI/UX 모범 사례
+
 - 모든 비동기 작업에 로딩 상태 표시
 - 복구 옵션이 있는 명확한 에러 메시지 표시
 - 로딩 중 스켈레톤 스크린 사용
@@ -522,6 +535,7 @@ turbo run dev --filter=@shopping-fraud-detector/client
 - 기존 디자인 시스템 준수
 
 ## 작업 시 주의사항
+
 1. 항상 기존 코드 구조를 먼저 확인
 2. 새 컴포넌트 생성 전 기존 컴포넌트 재사용
 3. 페이지 간 일관된 스타일 유지

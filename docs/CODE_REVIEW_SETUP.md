@@ -141,7 +141,7 @@ Focus specifically on:
 4. Performance issues in database queries
 
 File: ${file}
-...`
+...`;
 ```
 
 ### Rate Limiting 조정
@@ -164,10 +164,10 @@ await new Promise(resolve => setTimeout(resolve, 5000));
 ### 예상 비용 계산
 
 | 파일 수 | 평균 파일 크기 | 예상 토큰 수 | 예상 비용 |
-|--------|------------|------------|---------|
-| 1-3개  | ~100 lines | ~5K tokens | $0.05   |
-| 4-10개 | ~100 lines | ~20K tokens| $0.15   |
-| 11-20개| ~100 lines | ~40K tokens| $0.30   |
+| ------- | -------------- | ------------ | --------- |
+| 1-3개   | ~100 lines     | ~5K tokens   | $0.05     |
+| 4-10개  | ~100 lines     | ~20K tokens  | $0.15     |
+| 11-20개 | ~100 lines     | ~40K tokens  | $0.30     |
 
 ### 비용 절감 팁
 
@@ -228,6 +228,7 @@ permissions:
 **원인 3: 워크플로우가 비활성화됨**
 
 **해결**:
+
 1. GitHub Repository > **Actions** 탭
 2. 좌측에서 "AI Code Review" 워크플로우 선택
 3. **Enable workflow** 버튼 클릭
@@ -271,7 +272,7 @@ Error: 429 Too Many Requests
 jobs:
   code-review:
     runs-on: ubuntu-latest
-    timeout-minutes: 30  # 기본값: 360 (6시간)
+    timeout-minutes: 30 # 기본값: 360 (6시간)
 ```
 
 **옵션 2: 파일 수 제한**
@@ -294,8 +295,8 @@ if (changedFiles.length > MAX_FILES) {
 
 ```javascript
 const models = [
-  'claude-3-5-sonnet-20241022',    // 균형잡힌 리뷰
-  'claude-3-opus-20240229'         // 깊이 있는 리뷰
+  'claude-3-5-sonnet-20241022', // 균형잡힌 리뷰
+  'claude-3-opus-20240229', // 깊이 있는 리뷰
 ];
 
 for (const model of models) {
@@ -322,7 +323,7 @@ Format:
 \`\`\`suggestion
 // suggested code here
 \`\`\`
-`
+`;
 ```
 
 ### Slack 알림 통합

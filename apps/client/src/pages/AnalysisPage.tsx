@@ -1,88 +1,88 @@
-import { useState, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { analyzeProduct } from '../services/api'
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { analyzeProduct } from '../services/api';
 
 interface AnalysisResult {
-  brs: number
-  riskLevel: string
-  reasonCodes: string[]
+  brs: number;
+  riskLevel: string;
+  reasonCodes: string[];
   analyses: {
     price: {
-      score: number
-      median: number
-      mad: number
-      isOutlier: boolean
-    }
+      score: number;
+      median: number;
+      mad: number;
+      isOutlier: boolean;
+    };
     seller: {
-      score: number
-      trustScore: number
-    }
+      score: number;
+      trustScore: number;
+    };
     review: {
-      score: number
+      score: number;
       patterns: {
-        hasReviewSurge: boolean
-        hasRepetition: boolean
-        lacksDiversity: boolean
-      }
+        hasReviewSurge: boolean;
+        hasRepetition: boolean;
+        lacksDiversity: boolean;
+      };
       sentiment: {
-        positive: number
-        neutral: number
-        negative: number
-      }
-      abusingKeywords: string[]
-    }
-  }
+        positive: number;
+        neutral: number;
+        negative: number;
+      };
+      abusingKeywords: string[];
+    };
+  };
   recommendations: Array<{
-    url: string
-    title: string
-    price: number
-    brs: number
-  }>
-  analyzedAt: string
-  processingTime: number
+    url: string;
+    title: string;
+    price: number;
+    brs: number;
+  }>;
+  analyzedAt: string;
+  processingTime: number;
 }
 
 function AnalysisPage() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(true)
-  const [result, setResult] = useState<AnalysisResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const url = location.state?.url
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const url = location.state?.url;
 
   useEffect(() => {
     if (!url) {
-      navigate('/')
-      return
+      navigate('/');
+      return;
     }
 
     const fetchAnalysis = async () => {
       try {
-        setLoading(true)
-        const data = await analyzeProduct(url)
-        setResult(data)
+        setLoading(true);
+        const data = await analyzeProduct(url);
+        setResult(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : '분석 중 오류가 발생했습니다.')
+        setError(err instanceof Error ? err.message : '분석 중 오류가 발생했습니다.');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchAnalysis()
-  }, [url, navigate])
+    fetchAnalysis();
+  }, [url, navigate]);
 
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel) {
       case 'LOW':
-        return 'text-success'
+        return 'text-success';
       case 'MEDIUM':
-        return 'text-warning'
+        return 'text-warning';
       case 'HIGH':
-        return 'text-danger'
+        return 'text-danger';
       default:
-        return 'text-gray-600'
+        return 'text-gray-600';
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -92,7 +92,7 @@ function AnalysisPage() {
           <p className="text-xl text-gray-600">상품 분석 중...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -110,20 +110,17 @@ function AnalysisPage() {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!result) {
-    return null
+    return null;
   }
 
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-4xl mx-auto">
-        <button
-          onClick={() => navigate('/')}
-          className="mb-6 text-primary hover:underline"
-        >
+        <button onClick={() => navigate('/')} className="mb-6 text-primary hover:underline">
           ← 돌아가기
         </button>
 
@@ -133,32 +130,24 @@ function AnalysisPage() {
             <div className={`text-6xl font-bold ${getRiskColor(result.riskLevel)}`}>
               {result.brs}
             </div>
-            <p className="text-xl text-gray-600 mt-2">
-              위험도: {result.riskLevel}
-            </p>
+            <p className="text-xl text-gray-600 mt-2">위험도: {result.riskLevel}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="p-4 bg-gray-50 rounded-lg">
               <h3 className="font-semibold mb-2">가격 분석</h3>
-              <p className="text-2xl font-bold text-primary">
-                {result.analyses.price.score}점
-              </p>
+              <p className="text-2xl font-bold text-primary">{result.analyses.price.score}점</p>
               <p className="text-sm text-gray-600 mt-1">
                 {result.analyses.price.isOutlier ? '가격 이상치 감지' : '정상 가격 범위'}
               </p>
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <h3 className="font-semibold mb-2">판매자 신뢰도</h3>
-              <p className="text-2xl font-bold text-primary">
-                {result.analyses.seller.score}점
-              </p>
+              <p className="text-2xl font-bold text-primary">{result.analyses.seller.score}점</p>
             </div>
             <div className="p-4 bg-gray-50 rounded-lg">
               <h3 className="font-semibold mb-2">리뷰 분석</h3>
-              <p className="text-2xl font-bold text-primary">
-                {result.analyses.review.score}점
-              </p>
+              <p className="text-2xl font-bold text-primary">{result.analyses.review.score}점</p>
             </div>
           </div>
 
@@ -166,7 +155,7 @@ function AnalysisPage() {
             <div className="mb-6">
               <h3 className="font-semibold mb-3">위험 요소</h3>
               <div className="flex flex-wrap gap-2">
-                {result.reasonCodes.map((code) => (
+                {result.reasonCodes.map(code => (
                   <span
                     key={code}
                     className="px-3 py-1 bg-red-100 text-danger rounded-full text-sm"
@@ -187,12 +176,8 @@ function AnalysisPage() {
                 <div key={index} className="p-4 border border-gray-200 rounded-lg">
                   <h3 className="font-semibold mb-2">{rec.title}</h3>
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold">
-                      {rec.price.toLocaleString()}원
-                    </span>
-                    <span className="text-success font-semibold">
-                      BRS {rec.brs}점
-                    </span>
+                    <span className="text-lg font-bold">{rec.price.toLocaleString()}원</span>
+                    <span className="text-success font-semibold">BRS {rec.brs}점</span>
                   </div>
                   <a
                     href={rec.url}
@@ -209,7 +194,7 @@ function AnalysisPage() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default AnalysisPage
+export default AnalysisPage;

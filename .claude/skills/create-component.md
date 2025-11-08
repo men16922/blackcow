@@ -6,6 +6,7 @@ description: React 컴포넌트를 생성합니다 (TypeScript + Tailwind CSS)
 새로운 React 컴포넌트를 생성합니다.
 
 ## 생성 위치
+
 - `apps/client/src/components/` 디렉토리
 
 ## 템플릿 구조
@@ -27,6 +28,7 @@ export const [ComponentName]: React.FC<[ComponentName]Props> = ({}) => {
 ```
 
 ## 체크리스트
+
 - [ ] TypeScript 타입 정의
 - [ ] Props interface 작성
 - [ ] Tailwind CSS 클래스 사용

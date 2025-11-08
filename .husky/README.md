@@ -5,13 +5,17 @@
 ## 설정된 Hooks
 
 ### pre-commit
+
 커밋 전에 실행됩니다:
+
 - ESLint를 통한 코드 검사
 - Prettier를 통한 코드 포맷팅
 - 변경된 파일만 검사 (lint-staged)
 
 ### commit-msg
+
 커밋 메시지 작성 후 실행됩니다:
+
 - Conventional Commits 형식 검증
 - 올바른 형식: `<type>(<scope>): <description>`
 
