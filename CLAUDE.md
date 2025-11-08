@@ -19,7 +19,7 @@ AI 기반 온라인 쇼핑 사기 탐지 서비스입니다. 상품 URL을 분�
 - **Axios**: HTTP 클라이언트
 
 ### 백엔드 (apps/server)
-- **Node.js 18+**: 런타임
+- **Node.js 20.18.1+**: 런타임
 - **Express**: 웹 프레임워크
 - **TypeScript**: 타입 안정성
 - **Winston**: 로깅

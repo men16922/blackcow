@@ -31,8 +31,9 @@
     "lint-staged": "^15.2.0"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
+    "node": ">=20.18.1",
+    "npm": ">=9.0.0",
+    "yarn": ">=1.22.0"
   },
   "packageManager": "yarn@1.22.19"
 }
