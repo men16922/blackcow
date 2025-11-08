@@ -51,10 +51,10 @@ router.post('/', async (req, res) => {
       processingTime: 1000,
     };
 
-    res.json(result);
+    return res.json(result);
   } catch (error) {
     logger.error('Analysis error:', error);
-    res.status(500).json({ error: 'Failed to analyze product' });
+    return res.status(500).json({ error: 'Failed to analyze product' });
   }
 });
 

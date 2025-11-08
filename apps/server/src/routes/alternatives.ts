@@ -21,10 +21,10 @@ router.get('/', async (req, res) => {
       sortedBy: 'price_asc',
     };
 
-    res.json(result);
+    return res.json(result);
   } catch (error) {
     logger.error('Alternatives search error:', error);
-    res.status(500).json({ error: 'Failed to search alternatives' });
+    return res.status(500).json({ error: 'Failed to search alternatives' });
   }
 });
 
