@@ -86,8 +86,7 @@ export class RiskAnalyzer {
     const { statistics, outliers, prices } = priceComparison;
 
     // 1. 가격 변동성 체크 (표준편차 / 평균)
-    const variationCoef =
-      statistics.average > 0 ? statistics.stdDev / statistics.average : 0;
+    const variationCoef = statistics.average > 0 ? statistics.stdDev / statistics.average : 0;
 
     // 2. 이상치 비율
     const outlierRatio = prices.length > 0 ? outliers.length / prices.length : 0;
@@ -104,8 +103,7 @@ export class RiskAnalyzer {
     if (variationCoef > 0.5 || outlierRatio > 0.3 || rangeRatio > 1.5) {
       impact = 80;
       severity = 'HIGH';
-      description =
-        '가격 변동이 매우 심합니다. 비정상적으로 높거나 낮은 가격이 있을 수 있습니다.';
+      description = '가격 변동이 매우 심합니다. 비정상적으로 높거나 낮은 가격이 있을 수 있습니다.';
     } else if (variationCoef > 0.3 || outlierRatio > 0.15 || rangeRatio > 0.8) {
       impact = 50;
       severity = 'MEDIUM';
@@ -138,23 +136,14 @@ export class RiskAnalyzer {
     const { popularPlatforms } = summary;
 
     // 신뢰할 수 있는 플랫폼 목록
-    const trustedPlatforms = [
-      '쿠팡',
-      '네이버쇼핑',
-      '11번가',
-      'G마켓',
-      '옥션',
-      '티몬',
-      '위메프',
-    ];
+    const trustedPlatforms = ['쿠팡', '네이버쇼핑', '11번가', 'G마켓', '옥션', '티몬', '위메프'];
 
     // 신뢰 플랫폼에서 판매 중인지 확인
     const trustedCount = popularPlatforms.filter((p: string) =>
       trustedPlatforms.some((tp: string) => p.includes(tp))
     ).length;
 
-    const trustedRatio =
-      popularPlatforms.length > 0 ? trustedCount / popularPlatforms.length : 0;
+    const trustedRatio = popularPlatforms.length > 0 ? trustedCount / popularPlatforms.length : 0;
 
     let impact = 0;
     let severity: 'LOW' | 'MEDIUM' | 'HIGH' = 'LOW';

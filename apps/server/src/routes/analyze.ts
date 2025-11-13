@@ -57,11 +57,7 @@ router.post('/product', async (req, res) => {
     // 세션 처리
     let session = sessionId ? await dbService.getSession(sessionId) : null;
     if (!session) {
-      session = await dbService.createSession(
-        productName,
-        req.headers['user-agent'],
-        req.ip
-      );
+      session = await dbService.createSession(productName, req.headers['user-agent'], req.ip);
     }
 
     // 검색 이력 저장
@@ -116,11 +112,7 @@ router.post('/price', async (req, res) => {
     // 세션 처리
     let session = sessionId ? await dbService.getSession(sessionId) : null;
     if (!session) {
-      session = await dbService.createSession(
-        productName,
-        req.headers['user-agent'],
-        req.ip
-      );
+      session = await dbService.createSession(productName, req.headers['user-agent'], req.ip);
     }
 
     // 검색 이력 저장
@@ -175,11 +167,7 @@ router.post('/reviews', async (req, res) => {
     // 세션 처리
     let session = sessionId ? await dbService.getSession(sessionId) : null;
     if (!session) {
-      session = await dbService.createSession(
-        productName,
-        req.headers['user-agent'],
-        req.ip
-      );
+      session = await dbService.createSession(productName, req.headers['user-agent'], req.ip);
     }
 
     // 검색 이력 저장
@@ -244,11 +232,7 @@ router.post('/score', async (req, res) => {
     // 세션 처리
     let session = sessionId ? await dbService.getSession(sessionId) : null;
     if (!session) {
-      session = await dbService.createSession(
-        productName,
-        req.headers['user-agent'],
-        req.ip
-      );
+      session = await dbService.createSession(productName, req.headers['user-agent'], req.ip);
     }
 
     // 병렬로 모든 분석 수행
@@ -259,11 +243,7 @@ router.post('/score', async (req, res) => {
     ]);
 
     // 위험도 계산
-    const riskScore = riskAnalyzer.calculateRiskScore(
-      summary,
-      priceComparison,
-      reviewDigest
-    );
+    const riskScore = riskAnalyzer.calculateRiskScore(summary, priceComparison, reviewDigest);
 
     const processingTime = Date.now() - startTime;
 

@@ -201,7 +201,7 @@ import axios from 'axios';
 const perplexityClient = axios.create({
   baseURL: 'https://api.perplexity.ai',
   headers: {
-    'Authorization': `Bearer ${process.env.PERPLEXITY_API_KEY}`,
+    Authorization: `Bearer ${process.env.PERPLEXITY_API_KEY}`,
     'Content-Type': 'application/json',
   },
 });
@@ -229,7 +229,7 @@ export const searchProduct = async (productName: string) => {
     if (axios.isAxiosError(error)) {
       logger.error('Perplexity API error', {
         status: error.response?.status,
-        message: error.message
+        message: error.message,
       });
       throw new Error('검색 실패');
     }

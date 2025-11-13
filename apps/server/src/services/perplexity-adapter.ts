@@ -154,9 +154,7 @@ export class PerplexityAdapter {
     let priceRange: { min: number; max: number } | undefined;
 
     if (priceMatches.length > 0) {
-      averagePrice = Math.round(
-        priceMatches.reduce((a, b) => a + b, 0) / priceMatches.length
-      );
+      averagePrice = Math.round(priceMatches.reduce((a, b) => a + b, 0) / priceMatches.length);
       priceRange = {
         min: Math.min(...priceMatches),
         max: Math.max(...priceMatches),
@@ -240,8 +238,7 @@ export class PerplexityAdapter {
     // 표준편차 계산
     const variance =
       priceValues.length > 0
-        ? priceValues.reduce((sum, val) => sum + Math.pow(val - average, 2), 0) /
-          priceValues.length
+        ? priceValues.reduce((sum, val) => sum + Math.pow(val - average, 2), 0) / priceValues.length
         : 0;
     const stdDev = Math.round(Math.sqrt(variance));
 
@@ -300,9 +297,7 @@ export class PerplexityAdapter {
     let positiveCount = 0;
     let negativeCount = 0;
 
-    const allText = results
-      .map((r: PerplexitySearchResult) => `${r.title} ${r.snippet}`)
-      .join(' ');
+    const allText = results.map((r: PerplexitySearchResult) => `${r.title} ${r.snippet}`).join(' ');
 
     positiveKeywords.forEach(keyword => {
       const matches = allText.match(new RegExp(keyword, 'g'));
@@ -316,8 +311,7 @@ export class PerplexityAdapter {
 
     // 감정 점수 및 전반적인 감정 계산
     const total = positiveCount + negativeCount;
-    const sentimentScore =
-      total > 0 ? Math.round((positiveCount / total) * 100) : 50;
+    const sentimentScore = total > 0 ? Math.round((positiveCount / total) * 100) : 50;
 
     let overallSentiment: 'positive' | 'negative' | 'mixed' | 'neutral';
     if (sentimentScore >= 70) overallSentiment = 'positive';
