@@ -16,6 +16,7 @@
     "clean": "rm -rf dist node_modules"
   },
   "dependencies": {
+    "@shopping-fraud-detector/shared": "*",
     "express": "^4.18.2",
     "axios": "^1.6.2",
     "uuid": "^9.0.1",
