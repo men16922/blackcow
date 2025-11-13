@@ -29,8 +29,7 @@ AI 기반 온라인 쇼핑 사기 탐지 서비스입니다. 상품 URL을 분�
 - **Helmet**: 보안 미들웨어
 - **express-rate-limit**: API 속도 제한
 - **AWS SDK**: DynamoDB 클라이언트
-- **Anthropic SDK**: Claude API 클라이언트
-- **Cheerio**: HTML 파싱 및 크롤링
+- **Perplexity SDK**: Perplexity Search API 클라이언트
 
 ### 공유 패키지 (packages/)
 
@@ -179,11 +178,11 @@ yarn workspaces run lint
 
 ### Phase 1 (MVP) - 🚧 진행 중
 
-- ✅ 프로젝트 구조 세팅 (Turborepo)
-- ⏳ 상품 크롤링 (쿠팡, 네이버쇼핑, 11번가)
-- ⏳ 가격 분석 (Median + MAD 기반 이상치 탐지)
-- ⏳ 판매자 신뢰도 평가
-- ⏳ 리뷰 분석 (AI 기반)
+- ✅ 프로젝트 구조 세팅 (Yarn Workspaces)
+- ✅ 제품 정보 검색 (Perplexity Search API 기반)
+- ⏳ 가격 비교 분석 (여러 플랫폼 통계 분석)
+- ⏳ 플랫폼 신뢰도 평가
+- ⏳ 리뷰 요약 및 분석 (AI 기반)
 - ⏳ BRS 점수 계산
 - ⏳ 대안 상품 추천
 
@@ -663,7 +662,7 @@ chore: 빌드 프로세스 또는 도구 변경
 예시:
 
 ```
-feat(server): 상품 크롤링 기능 구현
+feat(server): Perplexity API 기반 제품 검색 구현
 fix(client): 분석 결과 페이지 렌더링 오류 수정
 docs: README에 환경 설정 가이드 추가
 ```
@@ -1222,7 +1221,7 @@ yarn workspace @shopping-fraud-detector/shared build
 ```bash
 feature/<기능명>
 # 예시:
-feature/product-crawling
+feature/perplexity-search
 feature/brs-calculation
 feature/ai-review-analysis
 ```
@@ -1282,14 +1281,14 @@ git checkout develop
 git pull origin develop
 
 # 기능 브랜치 생성
-git checkout -b feature/product-crawling
+git checkout -b feature/perplexity-search
 
 # 작업 진행 및 커밋
 git add .
-git commit -m "feat(server): 쿠팡 상품 크롤러 구현"
+git commit -m "feat(server): Perplexity API 기반 제품 검색 구현"
 
 # 원격 저장소에 푸시
-git push -u origin feature/product-crawling
+git push -u origin feature/perplexity-search
 ```
 
 **2. 중간 동기화** (작업이 오래 걸리는 경우)
@@ -1298,11 +1297,11 @@ git push -u origin feature/product-crawling
 # develop의 최신 변경사항 가져오기
 git checkout develop
 git pull origin develop
-git checkout feature/product-crawling
+git checkout feature/perplexity-search
 git merge develop
 
 # 충돌 해결 후
-git push origin feature/product-crawling
+git push origin feature/perplexity-search
 ```
 
 **3. PR 생성 및 머지**
@@ -1386,7 +1385,7 @@ git diff develop
 2. **제목 작성**
 
    ```
-   [FEAT] 상품 크롤링 기능 구현
+   [FEAT] Perplexity API 기반 제품 검색 구현
    [FIX] 로그인 에러 수정
    [REFACTOR] API 구조 개선
    [DOCS] 배포 가이드 추가
@@ -1455,7 +1454,7 @@ git diff develop
 #### 좋은 커밋 예시
 
 ```bash
-✅ git commit -m "feat(server): 쿠팡 상품 크롤러 구현"
+✅ git commit -m "feat(server): Perplexity API 기반 제품 검색 구현"
 ✅ git commit -m "fix(client): 무한 로딩 상태 수정"
 ✅ git commit -m "refactor(shared): 타입 정의 통합"
 ✅ git commit -m "docs: API 엔드포인트 문서화"

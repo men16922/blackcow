@@ -72,3 +72,9 @@ export interface Review {
   date: string;
   verified: boolean;
 }
+
+// Export Perplexity types
+export * from './perplexity.js';
+
+// Export Database types
+export * from './database.js';

@@ -50,7 +50,8 @@ export interface AnalysisResult {
 
 ```typescript
 export * from './types/analysis';
-export * from './types/crawler';
+export * from './types/perplexity';
+export * from './types/database';
 // ... 기타 타입
 ```
 

@@ -5,7 +5,6 @@ import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
 import { createLogger } from './utils/logger.js';
 import analyzeRouter from './routes/analyze.js';
-import alternativesRouter from './routes/alternatives.js';
 
 dotenv.config();
 
@@ -28,7 +27,6 @@ app.use('/api/', limiter);
 
 // Routes
 app.use('/api/analyze', analyzeRouter);
-app.use('/api/alternatives', alternativesRouter);
 
 // Health check
 app.get('/health', (_req, res) => {

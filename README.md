@@ -2,7 +2,9 @@
 
 > AI 기반 온라인 쇼핑 사기 탐지 서비스
 
-온라인 쇼핑몰 상품 링크를 분석하여 사기 위험도를 평가하고, 안전한 쇼핑을 돕는 웹 애플리케이션입니다.
+**제품명**을 입력하면 Perplexity Search API를 통해 가격, 리뷰, 판매 플랫폼 정보를 수집하여 사기 위험도를 평가하고, 안전한 쇼핑을 돕는 웹 애플리케이션입니다.
+
+> ⚠️ **중요 변경사항**: 법적 이슈로 인해 직접 웹 크롤링을 중단하고, Perplexity Search API 기반으로 전환했습니다.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
@@ -26,14 +28,14 @@
 
 ## ✨ 주요 기능
 
-### MVP (Phase 1)
+### MVP (Phase 1) - Perplexity API 기반
 
-- 🔍 **상품 크롤링**: 쿠팡, 네이버쇼핑, 11번가 지원
-- 💰 **가격 분석**: Median + MAD 기반 이상치 탐지
-- 👤 **판매자 신뢰도**: 계정 연령, 반품 정책, 배송지 평가
-- 📝 **리뷰 분석**: AI 기반 감정 분석 및 어뷰징 탐지
-- 📊 **BRS 점수**: 0-100점 사기 위험도 점수
-- 🎯 **대안 추천**: 위험 상품 대체 옵션 제공
+- 🔍 **제품 정보 검색**: Perplexity Search API를 통한 제품명 기반 정보 수집
+- 💰 **가격 비교 분석**: 여러 플랫폼(쿠팡, 네이버쇼핑, 11번가 등)의 가격 통계 및 이상치 탐지
+- 🏪 **플랫폼 신뢰도**: 판매 플랫폼의 신뢰도 평가
+- 📝 **리뷰 요약**: 긍정/부정 키워드 분석 및 감정 점수 계산
+- 📊 **위험도 점수**: 0-100점 사기 위험도 점수 (가격 40%, 플랫폼 20%, 리뷰 40%)
+- 💾 **검색 이력 저장**: DynamoDB를 통한 세션 및 검색 이력 관리
 
 ### Phase 2 (계획)
 
@@ -55,8 +57,8 @@
 - **Runtime**: Node.js 20
 - **Framework**: Express 4.x
 - **Database**: AWS DynamoDB
-- **AI/ML**: AWS Bedrock Claude Sonnet 4.0 / Claude API
-- **Crawler**: Cheerio, Axios
+- **Search API**: Perplexity AI (pplx-7b-online)
+- **HTTP Client**: Axios
 - **Logging**: Winston
 - **Security**: Helmet, express-rate-limit
 
@@ -140,61 +142,60 @@ NODE_ENV=development
 PORT=3000
 CLIENT_PORT=3001
 
-# AI 프로바이더 선택
-AI_PROVIDER=claude  # 'claude' 또는 'bedrock'
+# Perplexity API (필수)
+PERPLEXITY_API_KEY=pplx-your-api-key-here
+PERPLEXITY_MODEL=pplx-7b-online
 
-# Claude API (권장)
-CLAUDE_API_KEY=sk-ant-api03-your-key-here
-CLAUDE_MODEL=claude-3-5-sonnet-20241022
+# AWS Settings
+AWS_REGION=ap-northeast-2
 
-# 또는 AWS Bedrock (프로덕션 대안)
-AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=your_key
-AWS_SECRET_ACCESS_KEY=your_secret
-BEDROCK_MODEL_ID=anthropic.claude-sonnet-4-20250514-v1:0
-
-# DynamoDB
+# DynamoDB (로컬 개발 시)
 DYNAMODB_ENDPOINT=http://localhost:8000
+DYNAMODB_TABLE_SESSIONS=BlackCow_SearchSessions
+DYNAMODB_TABLE_HISTORY=BlackCow_SearchHistory
+DYNAMODB_TABLE_CACHE=BlackCow_AnalysisCache
 ```
+
+### 주요 변경사항 및 제한사항
+
+**변경사항:**
+- ❌ 직접 웹 크롤링 제거 (법적 이슈)
+- ✅ Perplexity Search API 기반 정보 수집
+- ✅ 제품명 입력 방식 (URL → 제품명)
+- ✅ DynamoDB 세션 및 이력 관리
+- ✅ 캐시 기능 (60분)
+
+**제한사항:**
+- 📌 URL이 아닌 **제품명**을 입력받음 (예: "아이폰 15 Pro", "닌텐도 스위치2")
+- 📌 실시간 크롤링이 아닌 **검색 결과 기반 분석**
+- 📌 정확도는 Perplexity의 검색 품질에 의존
+- 📌 가격 정보는 검색 결과에서 추출한 근사값
+- 📌 리뷰 분석은 키워드 기반 간단한 감정 분석
 
 ## 💻 로컬 개발
 
-### AI 프로바이더 선택
-
-#### Option 1: Claude API (권장) ⭐
+### Perplexity API 설정
 
 ```bash
-# 1. API Key 발급: https://console.anthropic.com
+# 1. API Key 발급: https://www.perplexity.ai/settings/api
 # 2. .env.local 설정
-AI_PROVIDER=claude
-CLAUDE_API_KEY=sk-ant-api03-xxx
+PERPLEXITY_API_KEY=pplx-xxx
+PERPLEXITY_MODEL=pplx-7b-online
 
 # 3. 개발 서버 시작
-npm run dev
+yarn dev
 ```
 
-**장점**: API Key만으로 즉시 사용, 높은 품질, 빠른 응답 속도
-**비용**: 신규 가입 시 $5 무료 크레딧, 이후 $0.003/1K 토큰
-**권장 용도**: 로컬 개발 및 프로덕션
+**장점**:
+- 실시간 검색 기반 정보 수집
+- 법적 이슈 없음 (크롤링 대신 검색 API 사용)
+- 빠른 응답 속도
 
-#### Option 2: AWS Bedrock (대안)
+**비용**:
+- 신규 가입 시 무료 크레딧 제공
+- 이후 사용량 기반 과금 (검색당 약 $0.001-0.01)
 
-```bash
-# 1. AWS 자격 증명 설정
-aws configure
-
-# 2. .env.local 설정
-AI_PROVIDER=bedrock
-AWS_ACCESS_KEY_ID=your_key
-AWS_SECRET_ACCESS_KEY=your_secret
-
-# 3. 개발 서버 시작
-npm run dev
-```
-
-**장점**: AWS 생태계 통합, 프로덕션 안정성
-**요구사항**: AWS 계정, IAM 권한
-**권장 용도**: AWS 인프라를 이미 사용 중인 경우
+**권장 모델**: `pplx-7b-online` (실시간 검색 지원)
 
 ### 협업 개발
 
@@ -370,15 +371,16 @@ shopping-fraud-detector/
 
 ## 📚 API 문서
 
-### POST /api/analyze
+### POST /api/analyze/product
 
-상품 URL을 분석하여 BRS 점수를 반환합니다.
+제품 기본 정보를 검색합니다.
 
 **Request:**
 
 ```json
 {
-  "url": "https://www.coupang.com/vp/products/123456"
+  "productName": "아이폰 15 Pro",
+  "sessionId": "optional-session-id"
 }
 ```
 
@@ -386,74 +388,174 @@ shopping-fraud-detector/
 
 ```json
 {
-  "brs": 65,
-  "riskLevel": "HIGH",
-  "reasonCodes": ["PRICE_OUTLIER", "REVIEW_ABUSING"],
-  "analyses": {
-    "price": {
-      "score": 40,
-      "median": 50000,
-      "mad": 5000,
-      "isOutlier": true
-    },
-    "seller": {
-      "score": 15,
-      "trustScore": 45
-    },
-    "review": {
-      "score": 10,
-      "patterns": {
-        "hasReviewSurge": true,
-        "hasRepetition": false,
-        "lacksDiversity": true
-      },
-      "sentiment": {
-        "positive": 27,
-        "neutral": 2,
-        "negative": 1
-      },
-      "abusingKeywords": ["정품", "최저가"]
-    }
+  "sessionId": "uuid-v4",
+  "productName": "아이폰 15 Pro",
+  "summary": {
+    "productName": "아이폰 15 Pro",
+    "averagePrice": 1500000,
+    "priceRange": { "min": 1400000, "max": 1600000 },
+    "popularPlatforms": ["쿠팡", "네이버쇼핑"],
+    "description": "애플의 최신 플래그십 스마트폰...",
+    "keyFeatures": ["A17 Pro 칩", "티타늄 디자인", "..."],
+    "searchedAt": "2025-11-13T12:00:00Z"
   },
-  "recommendations": [
-    {
-      "url": "https://www.naver.com/...",
-      "title": "대안 상품",
-      "price": 45000,
-      "brs": 25
-    }
-  ],
-  "analyzedAt": "2025-11-01T12:00:00Z",
-  "processingTime": 8500
+  "processingTime": 3500
 }
 ```
 
-### GET /api/alternatives
+### POST /api/analyze/price
 
-대안 상품을 검색합니다.
+가격 비교 정보를 검색합니다.
 
-**Query Parameters:**
+**Request:**
 
-- `productName`: 상품명 (required)
+```json
+{
+  "productName": "아이폰 15 Pro",
+  "sessionId": "optional-session-id"
+}
+```
 
 **Response:**
 
 ```json
 {
-  "alternatives": [
-    {
-      "url": "string",
-      "title": "string",
-      "price": 45000,
-      "platform": "naver",
-      "brs": 25,
-      "seller": {
-        "name": "string",
-        "trustScore": 85
+  "sessionId": "uuid-v4",
+  "productName": "아이폰 15 Pro",
+  "priceComparison": {
+    "productName": "아이폰 15 Pro",
+    "prices": [
+      {
+        "platform": "쿠팡",
+        "price": 1450000,
+        "url": "https://...",
+        "lastUpdated": "2025-11-13"
       }
+    ],
+    "statistics": {
+      "average": 1500000,
+      "median": 1490000,
+      "min": 1400000,
+      "max": 1600000,
+      "stdDev": 50000
+    },
+    "outliers": []
+  },
+  "processingTime": 4200
+}
+```
+
+### POST /api/analyze/reviews
+
+리뷰 요약 정보를 검색합니다.
+
+**Request:**
+
+```json
+{
+  "productName": "아이폰 15 Pro",
+  "sessionId": "optional-session-id"
+}
+```
+
+**Response:**
+
+```json
+{
+  "sessionId": "uuid-v4",
+  "productName": "아이폰 15 Pro",
+  "reviewDigest": {
+    "productName": "아이폰 15 Pro",
+    "overallSentiment": "positive",
+    "sentimentScore": 75,
+    "commonPraises": ["카메라 성능이 좋음", "배터리 오래감"],
+    "commonComplaints": ["가격이 비쌈"],
+    "keyInsights": ["전반적으로 만족도가 높음"]
+  },
+  "processingTime": 3800
+}
+```
+
+### POST /api/analyze/score
+
+종합 위험도 점수를 계산합니다 (제품 정보, 가격, 리뷰를 모두 분석).
+
+**Request:**
+
+```json
+{
+  "productName": "아이폰 15 Pro",
+  "sessionId": "optional-session-id",
+  "useCache": true
+}
+```
+
+**Response:**
+
+```json
+{
+  "sessionId": "uuid-v4",
+  "productName": "아이폰 15 Pro",
+  "summary": { ... },
+  "priceComparison": { ... },
+  "reviewDigest": { ... },
+  "riskScore": {
+    "score": 25,
+    "level": "LOW",
+    "factors": [
+      {
+        "category": "PRICE",
+        "severity": "LOW",
+        "description": "가격이 안정적입니다.",
+        "impact": 20
+      },
+      {
+        "category": "PLATFORM",
+        "severity": "LOW",
+        "description": "신뢰할 수 있는 플랫폼에서 판매 중입니다.",
+        "impact": 10
+      },
+      {
+        "category": "REVIEW",
+        "severity": "LOW",
+        "description": "사용자 리뷰가 대체로 긍정적입니다.",
+        "impact": 10
+      }
+    ],
+    "recommendation": "✅ 안전한 제품으로 보입니다. 자신있게 구매하세요!"
+  },
+  "analyzedAt": "2025-11-13T12:00:00Z",
+  "processingTime": 12500,
+  "fromCache": false
+}
+```
+
+### GET /api/analyze/session/:sessionId
+
+세션 정보 및 검색 이력을 조회합니다.
+
+**Response:**
+
+```json
+{
+  "session": {
+    "sessionId": "uuid-v4",
+    "productName": "아이폰 15 Pro",
+    "createdAt": "2025-11-13T12:00:00Z",
+    "updatedAt": "2025-11-13T12:05:00Z",
+    "analysisResult": { ... }
+  },
+  "history": [
+    {
+      "historyId": "uuid-v4",
+      "sessionId": "uuid-v4",
+      "productName": "아이폰 15 Pro",
+      "searchType": "product",
+      "query": "아이폰 15 Pro",
+      "results": { ... },
+      "createdAt": "2025-11-13T12:00:00Z"
     }
-  ],
-  "sortedBy": "price_asc"
+  ]
 }
 ```
 
@@ -651,10 +753,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 감사의 말
 
-- [Anthropic Claude](https://www.anthropic.com/) - Claude API
-- [AWS Bedrock](https://aws.amazon.com/bedrock/) - AI 모델 제공
-- [Cheerio](https://cheerio.js.org/) - HTML 파싱
+- [Perplexity AI](https://www.perplexity.ai/) - Search API 제공
+- [AWS](https://aws.amazon.com/) - DynamoDB 및 인프라
 - [React](https://react.dev/) - UI 프레임워크
+- [Express](https://expressjs.com/) - 백엔드 프레임워크
 
 ---
 

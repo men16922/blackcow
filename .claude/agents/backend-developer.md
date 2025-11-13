@@ -10,11 +10,11 @@
 - **프레임워크**: Express.js 4.x
 - **언어**: TypeScript
 - **데이터베이스**: AWS DynamoDB (로컬 & 프로덕션)
-- **AI**: Anthropic Claude API (Claude Sonnet 4.0)
-- **크롤러**: Cheerio, Axios
+- **검색 API**: Perplexity AI (pplx-7b-online)
+- **HTTP 클라이언트**: Axios
 - **로깅**: Winston
 - **보안**: Helmet, express-rate-limit
-- **모노레포**: Turborepo + Yarn Workspaces
+- **모노레포**: Yarn Workspaces
 
 ## 프로젝트 구조
 
@@ -22,7 +22,7 @@
 apps/server/
 ├── src/
 │   ├── routes/          # API 라우트 정의
-│   ├── services/        # 비즈니스 로직 (분석, 크롤링)
+│   ├── services/        # 비즈니스 로직 (분석, 검색)
 │   ├── models/          # 데이터 모델 및 타입
 │   ├── db/              # DynamoDB 클라이언트
 │   ├── middleware/      # Express 미들웨어
@@ -64,17 +64,17 @@ apps/server/
 - 외부 API 타임아웃 처리 (최대 30초)
 - 프롬프트 최적화 및 응답 파싱
 
-### 5. 웹 크롤링
+### 5. Perplexity API 통합
 
-- Cheerio를 사용한 쿠팡, 네이버쇼핑, 11번가 크롤링
-- 크롤러 실패 시 재시도 메커니즘 구현
-- User-Agent 및 헤더 설정
-- 속도 제한 준수
+- Perplexity Search API를 활용한 제품 정보 검색
+- API 요청 실패 시 재시도 메커니즘 구현
+- 검색 쿼리 최적화
+- API 속도 제한 준수
 
 ### 6. 성능 및 확장성
 
-- 상품 데이터 및 AI 결과 캐싱 구현
-- 크롤러 성능 최적화
+- 상품 데이터 및 검색 결과 캐싱 구현 (60분 TTL)
+- API 요청 최적화
 - 속도 제한 적용 (사용자당 분당 10개 요청)
 - 성능 메트릭 모니터링 및 로깅
 
@@ -82,20 +82,20 @@ apps/server/
 
 ```typescript
 // TypeScript와 async/await을 사용한 적절한 에러 처리
-async function analyzeProduct(url: string): Promise<AnalysisResult> {
+async function analyzeProduct(productName: string): Promise<AnalysisResult> {
   try {
-    const productData = await crawlProduct(url);
-    const priceScore = await analyzePriceAnomaly(productData);
-    const sellerScore = await analyzeSellerTrust(productData);
+    const productData = await searchProductInfo(productName);
+    const priceScore = await analyzePriceComparison(productData);
+    const platformScore = await analyzePlatformTrust(productData);
     const reviewScore = await analyzeReviews(productData);
 
     return calculateBRS({
       price: priceScore,
-      seller: sellerScore,
+      platform: platformScore,
       review: reviewScore,
     });
   } catch (error) {
-    logger.error('상품 분석 실패', { url, error });
+    logger.error('상품 분석 실패', { productName, error });
     throw new AnalysisError('상품 분석에 실패했습니다', error);
   }
 }
@@ -210,13 +210,13 @@ class AnalysisError extends Error {
   }
 }
 
-class CrawlerError extends Error {
+class SearchError extends Error {
   constructor(
     message: string,
-    public url: string
+    public productName: string
   ) {
     super(message);
-    this.name = 'CrawlerError';
+    this.name = 'SearchError';
   }
 }
 
@@ -232,11 +232,11 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  if (err instanceof CrawlerError) {
+  if (err instanceof SearchError) {
     return res.status(400).json({
-      error: '크롤링 실패',
-      message: '상품 정보를 가져올 수 없습니다',
-      url: err.url,
+      error: '검색 실패',
+      message: '상품 정보를 찾을 수 없습니다',
+      productName: err.productName,
     });
   }
 
@@ -246,15 +246,17 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 ## API 엔드포인트
 
-### POST /api/analyze
+### POST /api/analyze/score
 
-상품 URL을 분석하여 BRS 점수 반환
+제품명을 입력받아 종합 BRS 점수 반환
 
 **Request:**
 
 ```typescript
 {
-  url: string; // 상품 URL (쿠팡, 네이버쇼핑, 11번가)
+  productName: string; // 제품명 (예: "아이폰 15 Pro")
+  sessionId?: string;  // 선택적 세션 ID
+  useCache?: boolean;  // 캐시 사용 여부 (기본: true)
 }
 ```
 
@@ -276,19 +278,19 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 }
 ```
 
-### GET /api/alternatives
+### GET /api/analyze/session/:sessionId
 
-대안 상품 검색
+세션 정보 및 검색 이력 조회
 
-**Query Parameters:**
+**Path Parameters:**
 
-- `productName`: 상품명 (required)
+- `sessionId`: 세션 ID (required)
 
 ## 테스트 요구사항
 
 - 모든 비즈니스 로직 함수에 대한 단위 테스트 작성
 - API 엔드포인트에 대한 통합 테스트
-- 외부 종속성(AI, DynamoDB, 크롤러) 모킹
+- 외부 종속성(Perplexity API, DynamoDB) 모킹
 - 에러 처리 및 엣지 케이스 테스트
 - 80% 이상의 코드 커버리지 목표
 
@@ -296,10 +298,10 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 1. 항상 기존 코드 구조를 먼저 확인
 2. `packages/shared`의 공통 타입 활용
-3. Turborepo 워크스페이스 구조 준수
+3. Yarn Workspaces 구조 준수
 4. 새 엔드포인트 추가 시 API 문서 업데이트
 5. 중요한 작업에 대한 Winston 로깅 추가
-6. 성능 영향 고려 (캐싱, 속도 제한)
+6. 성능 영향 고려 (캐싱 60분, 속도 제한)
 7. 엣지 케이스 및 에러를 우아하게 처리
 
 ## 보안 체크리스트
@@ -315,13 +317,13 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 ## 성능 최적화 팁
 
-- 자주 액세스하는 데이터를 DynamoDB에 TTL과 함께 캐싱
-- 단순 HTML 파싱에는 Playwright/Selenium 대신 Cheerio 사용
+- 자주 액세스하는 데이터를 DynamoDB에 60분 TTL과 함께 캐싱
+- Perplexity API 요청 최소화 (캐시 활용)
 - 외부 서비스에 대한 연결 풀링 구현
 - API 응답 압축
 - 대용량 결과 집합에 페이지네이션 구현
 
-## Turborepo 명령어
+## Yarn Workspaces 명령어
 
 ```bash
 # 서버만 개발 모드로 실행
@@ -335,9 +337,6 @@ yarn workspace @shopping-fraud-detector/server test
 
 # 모든 워크스페이스 빌드
 yarn build
-
-# 서버 필터링
-turbo run dev --filter=@shopping-fraud-detector/server
 ```
 
 ## 협업 참고사항
