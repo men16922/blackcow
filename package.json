@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "dev": "concurrently \"yarn workspace @shopping-fraud-detector/client dev\" \"yarn workspace @shopping-fraud-detector/server dev\"",
-    "build": "yarn workspace @shopping-fraud-detector/shared build && concurrently \"yarn workspace @shopping-fraud-detector/client build\" \"yarn workspace @shopping-fraud-detector/server build\"",
+    "build": "yarn workspace @shopping-fraud-detector/shared build && concurrently -n client,server -c auto --raw --kill-others-on-fail --success=all \"yarn workspace @shopping-fraud-detector/client build\" \"yarn workspace @shopping-fraud-detector/server build\"",
     "test": "yarn workspaces run test",
     "test:integration": "yarn workspaces run test:integration",
     "test:e2e": "yarn workspaces run test:e2e",
