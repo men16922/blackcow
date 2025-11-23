@@ -37,11 +37,11 @@ check_dynamodb_connection() {
     fi
 }
 
-# Products 테이블 생성
-create_products_table() {
-    log_info "Creating Products table..."
+# BlackCow_SearchSessions 테이블 생성
+create_search_sessions_table() {
+    log_info "Creating BlackCow_SearchSessions table..."
 
-    TABLE_NAME="Products"
+    TABLE_NAME="BlackCow_SearchSessions"
 
     # 테이블이 이미 존재하는지 확인
     if aws dynamodb describe-table --table-name "$TABLE_NAME" --endpoint-url "$DYNAMODB_ENDPOINT" > /dev/null 2>&1; then
@@ -52,44 +52,38 @@ create_products_table() {
     aws dynamodb create-table \
         --table-name "$TABLE_NAME" \
         --attribute-definitions \
-            AttributeName=id,AttributeType=S \
-            AttributeName=url,AttributeType=S \
-            AttributeName=createdAt,AttributeType=N \
+            AttributeName=sessionId,AttributeType=S \
+            AttributeName=productName,AttributeType=S \
+            AttributeName=createdAt,AttributeType=S \
         --key-schema \
-            AttributeName=id,KeyType=HASH \
+            AttributeName=sessionId,KeyType=HASH \
         --global-secondary-indexes \
             '[
                 {
-                    "IndexName": "UrlIndex",
-                    "KeySchema": [{"AttributeName":"url","KeyType":"HASH"}],
+                    "IndexName": "ProductNameIndex",
+                    "KeySchema": [
+                        {"AttributeName":"productName","KeyType":"HASH"},
+                        {"AttributeName":"createdAt","KeyType":"RANGE"}
+                    ],
                     "Projection": {"ProjectionType":"ALL"},
                     "ProvisionedThroughput": {
-                        "ReadCapacityUnits": 5,
-                        "WriteCapacityUnits": 5
-                    }
-                },
-                {
-                    "IndexName": "CreatedAtIndex",
-                    "KeySchema": [{"AttributeName":"createdAt","KeyType":"HASH"}],
-                    "Projection": {"ProjectionType":"ALL"},
-                    "ProvisionedThroughput": {
-                        "ReadCapacityUnits": 5,
-                        "WriteCapacityUnits": 5
+                        "ReadCapacityUnits": 1,
+                        "WriteCapacityUnits": 1
                     }
                 }
             ]' \
         --provisioned-throughput \
-            ReadCapacityUnits=5,WriteCapacityUnits=5 \
-        --endpoint-url "$DYNAMODB_ENDPOINT"
+            ReadCapacityUnits=1,WriteCapacityUnits=1 \
+        --endpoint-url "$DYNAMODB_ENDPOINT" > /dev/null
 
     log_info "Table '$TABLE_NAME' created successfully ✓"
 }
 
-# AnalysisHistory 테이블 생성
-create_analysis_history_table() {
-    log_info "Creating AnalysisHistory table..."
+# BlackCow_SearchHistory 테이블 생성
+create_search_history_table() {
+    log_info "Creating BlackCow_SearchHistory table..."
 
-    TABLE_NAME="AnalysisHistory"
+    TABLE_NAME="BlackCow_SearchHistory"
 
     # 테이블이 이미 존재하는지 확인
     if aws dynamodb describe-table --table-name "$TABLE_NAME" --endpoint-url "$DYNAMODB_ENDPOINT" > /dev/null 2>&1; then
@@ -100,29 +94,68 @@ create_analysis_history_table() {
     aws dynamodb create-table \
         --table-name "$TABLE_NAME" \
         --attribute-definitions \
-            AttributeName=id,AttributeType=S \
-            AttributeName=productId,AttributeType=S \
-            AttributeName=timestamp,AttributeType=N \
+            AttributeName=historyId,AttributeType=S \
+            AttributeName=createdAt,AttributeType=S \
+            AttributeName=sessionId,AttributeType=S \
+            AttributeName=searchType,AttributeType=S \
         --key-schema \
-            AttributeName=id,KeyType=HASH \
+            AttributeName=historyId,KeyType=HASH \
+            AttributeName=createdAt,KeyType=RANGE \
         --global-secondary-indexes \
             '[
                 {
-                    "IndexName": "ProductIdIndex",
+                    "IndexName": "SessionIndex",
                     "KeySchema": [
-                        {"AttributeName":"productId","KeyType":"HASH"},
-                        {"AttributeName":"timestamp","KeyType":"RANGE"}
+                        {"AttributeName":"sessionId","KeyType":"HASH"},
+                        {"AttributeName":"createdAt","KeyType":"RANGE"}
                     ],
                     "Projection": {"ProjectionType":"ALL"},
                     "ProvisionedThroughput": {
-                        "ReadCapacityUnits": 5,
-                        "WriteCapacityUnits": 5
+                        "ReadCapacityUnits": 1,
+                        "WriteCapacityUnits": 1
+                    }
+                },
+                {
+                    "IndexName": "SearchTypeIndex",
+                    "KeySchema": [
+                        {"AttributeName":"searchType","KeyType":"HASH"},
+                        {"AttributeName":"createdAt","KeyType":"RANGE"}
+                    ],
+                    "Projection": {"ProjectionType":"ALL"},
+                    "ProvisionedThroughput": {
+                        "ReadCapacityUnits": 1,
+                        "WriteCapacityUnits": 1
                     }
                 }
             ]' \
         --provisioned-throughput \
-            ReadCapacityUnits=5,WriteCapacityUnits=5 \
-        --endpoint-url "$DYNAMODB_ENDPOINT"
+            ReadCapacityUnits=1,WriteCapacityUnits=1 \
+        --endpoint-url "$DYNAMODB_ENDPOINT" > /dev/null
+
+    log_info "Table '$TABLE_NAME' created successfully ✓"
+}
+
+# BlackCow_AnalysisCache 테이블 생성
+create_analysis_cache_table() {
+    log_info "Creating BlackCow_AnalysisCache table..."
+
+    TABLE_NAME="BlackCow_AnalysisCache"
+
+    # 테이블이 이미 존재하는지 확인
+    if aws dynamodb describe-table --table-name "$TABLE_NAME" --endpoint-url "$DYNAMODB_ENDPOINT" > /dev/null 2>&1; then
+        log_warn "Table '$TABLE_NAME' already exists, skipping..."
+        return 0
+    fi
+
+    aws dynamodb create-table \
+        --table-name "$TABLE_NAME" \
+        --attribute-definitions \
+            AttributeName=cacheKey,AttributeType=S \
+        --key-schema \
+            AttributeName=cacheKey,KeyType=HASH \
+        --provisioned-throughput \
+            ReadCapacityUnits=1,WriteCapacityUnits=1 \
+        --endpoint-url "$DYNAMODB_ENDPOINT" > /dev/null
 
     log_info "Table '$TABLE_NAME' created successfully ✓"
 }
@@ -144,13 +177,14 @@ list_tables() {
 # 메인 실행
 main() {
     echo "======================================"
-    echo "  DynamoDB Setup for Shopping Fraud Detector  "
+    echo "  DynamoDB Setup for BlackCow  "
     echo "======================================"
     echo ""
 
     check_dynamodb_connection
-    create_products_table
-    create_analysis_history_table
+    create_search_sessions_table
+    create_search_history_table
+    create_analysis_cache_table
     list_tables
 
     log_info "🎉 DynamoDB setup completed successfully!"

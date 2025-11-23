@@ -22,7 +22,7 @@
     "type-check": "yarn workspaces run type-check",
     "clean": "yarn workspaces run clean && rm -rf node_modules",
     "setup:local": "node scripts/setup-local.js",
-    "setup:dynamodb": "node scripts/setup-dynamodb.js",
+    "setup:dynamodb": "bash scripts/setup-db.sh",
     "prepare": "husky install"
   },
   "devDependencies": {
