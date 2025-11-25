@@ -154,7 +154,10 @@ export class ProductAnalysisService {
 
     if (this.dbClient) {
       try {
-        await this.dbClient.putItem('SearchSessions', session as unknown as Record<string, unknown>);
+        await this.dbClient.putItem(
+          'SearchSessions',
+          session as unknown as Record<string, unknown>
+        );
         logger.info('세션 생성 완료', { sessionId: session.sessionId });
       } catch (error) {
         logger.error('세션 생성 실패', { error });
