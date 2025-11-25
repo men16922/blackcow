@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev": "concurrently \"yarn workspace @shopping-fraud-detector/client dev\" \"yarn workspace @shopping-fraud-detector/server dev\"",
+    "dev:local": "concurrently \"yarn workspace @shopping-fraud-detector/client dev\" \"yarn workspace @shopping-fraud-detector/server dev:local\"",
     "build": "yarn workspace @shopping-fraud-detector/shared build && concurrently -n client,server -c auto --raw --kill-others-on-fail --success=all \"yarn workspace @shopping-fraud-detector/client build\" \"yarn workspace @shopping-fraud-detector/server build\"",
     "test": "yarn workspaces run test",
     "test:integration": "yarn workspaces run test:integration",
@@ -21,7 +22,7 @@
     "type-check": "yarn workspaces run type-check",
     "clean": "yarn workspaces run clean && rm -rf node_modules",
     "setup:local": "node scripts/setup-local.js",
-    "setup:dynamodb": "node scripts/setup-dynamodb.js",
+    "setup:dynamodb": "bash scripts/setup-db.sh",
     "prepare": "husky install"
   },
   "devDependencies": {

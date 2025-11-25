@@ -31,9 +31,17 @@ export class DynamoDBService {
   };
 
   constructor() {
+    const endpoint = process.env.DYNAMODB_ENDPOINT;
+    const region = process.env.AWS_REGION || 'ap-northeast-2';
+
+    logger.info('DynamoDB Client 초기화', {
+      endpoint: endpoint || '(AWS DynamoDB)',
+      region,
+    });
+
     const baseClient = new DynamoDBClient({
-      region: process.env.AWS_REGION || 'ap-northeast-2',
-      endpoint: process.env.DYNAMODB_ENDPOINT, // 로컬 개발용
+      region,
+      ...(endpoint && { endpoint }), // endpoint가 있을 때만 설정
     });
 
     this.client = DynamoDBDocumentClient.from(baseClient);
@@ -43,6 +51,8 @@ export class DynamoDBService {
       history: process.env.DYNAMODB_TABLE_HISTORY || 'BlackCow_SearchHistory',
       cache: process.env.DYNAMODB_TABLE_CACHE || 'BlackCow_AnalysisCache',
     };
+
+    logger.info('DynamoDB 테이블 이름', this.tableName);
   }
 
   /**
@@ -53,13 +63,17 @@ export class DynamoDBService {
     userAgent?: string,
     ipAddress?: string
   ): Promise<SearchSession> {
+    const ttl = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60; // 30일 후
+
     const session: SearchSession = {
       sessionId: uuidv4(),
       productName,
+      status: 'pending',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       userAgent,
       ipAddress,
+      ttl,
     };
 
     try {
@@ -130,18 +144,27 @@ export class DynamoDBService {
   async saveSearchHistory(
     sessionId: string,
     productName: string,
-    searchType: 'product' | 'price' | 'review' | 'score',
+    searchType: 'product' | 'price' | 'review' | 'risk',
     query: string,
-    results: unknown
+    response: unknown,
+    processingTime: number,
+    success: boolean = true,
+    errorMessage?: string
   ): Promise<SearchHistory> {
+    const ttl = Math.floor(Date.now() / 1000) + 90 * 24 * 60 * 60; // 90일 후
+
     const history: SearchHistory = {
       historyId: uuidv4(),
       sessionId,
       productName,
       searchType,
       query,
-      results,
+      response,
+      processingTime,
+      success,
+      errorMessage,
       createdAt: new Date().toISOString(),
+      ttl,
     };
 
     try {
@@ -194,11 +217,12 @@ export class DynamoDBService {
   async saveAnalysisCache(
     productName: string,
     analysisResult: ProductAnalysisResult,
-    ttlMinutes: number = 60
+    ttlHours: number = 24
   ): Promise<void> {
     const cacheKey = this.generateCacheKey(productName);
     const now = new Date();
-    const expiresAt = new Date(now.getTime() + ttlMinutes * 60 * 1000);
+    const expiresAt = new Date(now.getTime() + ttlHours * 60 * 60 * 1000);
+    const ttl = Math.floor(expiresAt.getTime() / 1000);
 
     const cache: AnalysisCache = {
       cacheKey,
@@ -207,6 +231,9 @@ export class DynamoDBService {
       createdAt: now.toISOString(),
       expiresAt: expiresAt.toISOString(),
       hitCount: 0,
+      lastAccessedAt: now.toISOString(),
+      version: '1.0.0',
+      ttl,
     };
 
     try {
@@ -281,5 +308,183 @@ export class DynamoDBService {
       .replace(/[^a-z0-9가-힣]/g, '');
 
     return `product:${normalized}`;
+  }
+
+  /**
+   * Generic: 테이블에서 아이템 조회
+   */
+  async getItem<T>(tableName: string, key: Record<string, unknown>): Promise<T | null> {
+    try {
+      const result = await this.client.send(
+        new GetCommand({
+          TableName: tableName,
+          Key: key,
+        })
+      );
+
+      return (result.Item as T) || null;
+    } catch (error) {
+      logger.error('아이템 조회 실패', { tableName, key, error });
+      return null;
+    }
+  }
+
+  /**
+   * Generic: 테이블에 아이템 저장
+   */
+  async putItem<T extends Record<string, unknown>>(
+    tableName: string,
+    item: T
+  ): Promise<void> {
+    try {
+      await this.client.send(
+        new PutCommand({
+          TableName: tableName,
+          Item: item,
+        })
+      );
+
+      logger.info('아이템 저장 완료', { tableName });
+    } catch (error) {
+      logger.error('아이템 저장 실패', { tableName, error });
+      throw error;
+    }
+  }
+
+  /**
+   * Generic: 테이블에서 아이템 업데이트 (UpdateExpression 사용)
+   */
+  async updateItem(
+    tableName: string,
+    key: Record<string, unknown>,
+    updates: Record<string, unknown>
+  ): Promise<void> {
+    try {
+      // UpdateExpression 생성
+      const updateExpressions: string[] = [];
+      const expressionAttributeNames: Record<string, string> = {};
+      const expressionAttributeValues: Record<string, unknown> = {};
+
+      Object.entries(updates).forEach(([field, value], index) => {
+        const nameKey = `#field${index}`;
+        const valueKey = `:value${index}`;
+
+        expressionAttributeNames[nameKey] = field;
+        expressionAttributeValues[valueKey] = value;
+        updateExpressions.push(`${nameKey} = ${valueKey}`);
+      });
+
+      await this.client.send(
+        new UpdateCommand({
+          TableName: tableName,
+          Key: key,
+          UpdateExpression: `SET ${updateExpressions.join(', ')}`,
+          ExpressionAttributeNames: expressionAttributeNames,
+          ExpressionAttributeValues: expressionAttributeValues,
+        })
+      );
+
+      logger.info('아이템 업데이트 완료', { tableName });
+    } catch (error) {
+      logger.error('아이템 업데이트 실패', { tableName, key, error });
+      throw error;
+    }
+  }
+
+  /**
+   * Generic: 테이블에서 아이템 삭제
+   */
+  async deleteItem(tableName: string, key: Record<string, unknown>): Promise<void> {
+    try {
+      const DeleteCommand = (await import('@aws-sdk/lib-dynamodb')).DeleteCommand;
+
+      await this.client.send(
+        new DeleteCommand({
+          TableName: tableName,
+          Key: key,
+        })
+      );
+
+      logger.info('아이템 삭제 완료', { tableName });
+    } catch (error) {
+      logger.error('아이템 삭제 실패', { tableName, key, error });
+      throw error;
+    }
+  }
+
+  /**
+   * Generic: 숫자 필드 증가 (원자적 연산)
+   */
+  async incrementField(
+    tableName: string,
+    key: Record<string, unknown>,
+    field: string,
+    incrementBy: number = 1
+  ): Promise<void> {
+    try {
+      await this.client.send(
+        new UpdateCommand({
+          TableName: tableName,
+          Key: key,
+          UpdateExpression: `SET ${field} = if_not_exists(${field}, :zero) + :inc`,
+          ExpressionAttributeValues: {
+            ':zero': 0,
+            ':inc': incrementBy,
+          },
+        })
+      );
+
+      logger.debug('필드 증가 완료', { tableName, field, incrementBy });
+    } catch (error) {
+      logger.error('필드 증가 실패', { tableName, key, field, error });
+      throw error;
+    }
+  }
+
+  /**
+   * Generic: 쿼리 실행 (GSI 사용)
+   */
+  async query<T>(
+    tableName: string,
+    options: {
+      IndexName?: string;
+      KeyConditionExpression: string;
+      ExpressionAttributeValues: Record<string, unknown>;
+      ExpressionAttributeNames?: Record<string, string>;
+    }
+  ): Promise<T[]> {
+    try {
+      const result = await this.client.send(
+        new QueryCommand({
+          TableName: tableName,
+          ...options,
+        })
+      );
+
+      return (result.Items as T[]) || [];
+    } catch (error) {
+      logger.error('쿼리 실패', { tableName, error });
+      return [];
+    }
+  }
+
+  /**
+   * Generic: 테이블 전체 스캔
+   */
+  async scan<T>(tableName: string): Promise<T[]> {
+    try {
+      const ScanCommand = (await import('@aws-sdk/lib-dynamodb')).ScanCommand;
+
+      const result = await this.client.send(
+        new ScanCommand({
+          TableName: tableName,
+        })
+      );
+
+      return (result.Items as T[]) || [];
+    } catch (error) {
+      logger.error('스캔 실패', { tableName, error });
+      return [];
+    }
   }
 }

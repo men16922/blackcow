@@ -2,6 +2,30 @@
  * Perplexity API 관련 타입 정의
  */
 
+/**
+ * 프롬프트 템플릿 타입
+ */
+export type PromptTemplateType = 'product' | 'price' | 'review' | 'risk';
+
+/**
+ * 프롬프트 변수
+ */
+export interface PromptVariables {
+  productName: string;
+  [key: string]: string | number | boolean;
+}
+
+/**
+ * 프롬프트 템플릿
+ */
+export interface PromptTemplate {
+  type: PromptTemplateType;
+  template: string;
+  description: string;
+  variables: string[]; // 필요한 변수 목록
+  example?: string; // 예시 프롬프트
+}
+
 // Perplexity API 요청
 export interface PerplexitySearchRequest {
   query: string | string[];

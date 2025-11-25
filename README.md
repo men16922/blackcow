@@ -132,6 +132,9 @@ yarn setup:dynamodb
 
 # 7. 개발 서버 시작
 yarn dev
+
+# 8. DynamoDB ADMIN 접속
+http://localhost:8001
 ```
 
 ### 환경 변수 설정

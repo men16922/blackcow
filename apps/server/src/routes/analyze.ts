@@ -13,22 +13,51 @@ import type { ProductAnalysisResult } from '@shopping-fraud-detector/shared';
 const router = Router();
 const logger = createLogger();
 
-// 환경 변수 검증
-const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
-const PERPLEXITY_MODEL = process.env.PERPLEXITY_MODEL || 'pplx-7b-online';
-
-if (!PERPLEXITY_API_KEY) {
-  logger.error('PERPLEXITY_API_KEY 환경 변수가 설정되지 않았습니다.');
-}
-
 // 서비스 인스턴스
 let perplexityAdapter: PerplexityAdapter | null = null;
+let dbService: DynamoDBService | null = null;
 const riskAnalyzer = new RiskAnalyzer();
-const dbService = new DynamoDBService();
 
-// Perplexity Adapter 초기화
-if (PERPLEXITY_API_KEY) {
-  perplexityAdapter = new PerplexityAdapter(PERPLEXITY_API_KEY, PERPLEXITY_MODEL);
+// Lazy initialization function for Perplexity Adapter
+function getPerplexityAdapter(): PerplexityAdapter {
+  if (!perplexityAdapter) {
+    const PERPLEXITY_API_KEY = process.env.PERPLEXITY_API_KEY;
+    const PERPLEXITY_MODEL = process.env.PERPLEXITY_MODEL || 'pplx-7b-online';
+
+    if (!PERPLEXITY_API_KEY) {
+      throw new Error('PERPLEXITY_API_KEY 환경 변수가 설정되지 않았습니다.');
+    }
+
+    perplexityAdapter = new PerplexityAdapter(PERPLEXITY_API_KEY, PERPLEXITY_MODEL);
+    logger.info('Perplexity Adapter initialized');
+  }
+  return perplexityAdapter;
+}
+
+// Lazy initialization function for DynamoDB Service
+function getDBService(): DynamoDBService {
+  if (!dbService) {
+    dbService = new DynamoDBService();
+    logger.info('DynamoDB Service initialized');
+  }
+  return dbService;
+}
+
+/**
+ * 세션 가져오기 또는 생성 헬퍼 함수
+ */
+async function getOrCreateSession(
+  productName: string,
+  sessionId: string | undefined,
+  userAgent: string | undefined
+): Promise<import('@shopping-fraud-detector/shared').SearchSession> {
+  if (sessionId) {
+    const existingSession = await getDBService().getSession(sessionId);
+    if (existingSession) {
+      return existingSession;
+    }
+  }
+  return await getDBService().createSession(productName, userAgent);
 }
 
 /**
@@ -45,31 +74,27 @@ router.post('/product', async (req, res) => {
       return res.status(400).json({ error: '제품명(productName)이 필요합니다.' });
     }
 
-    if (!perplexityAdapter) {
-      return res.status(503).json({ error: 'Perplexity API가 설정되지 않았습니다.' });
-    }
-
     logger.info('제품 정보 분석 시작', { productName, sessionId });
 
-    // 제품 요약 정보 가져오기
-    const summary = await perplexityAdapter.getProductSummary(productName);
-
     // 세션 처리
-    let session = sessionId ? await dbService.getSession(sessionId) : null;
-    if (!session) {
-      session = await dbService.createSession(productName, req.headers['user-agent'], req.ip);
-    }
+    const session = await getOrCreateSession(productName, sessionId, req.headers['user-agent']);
+
+    // 제품 요약 정보 가져오기
+    const adapter = getPerplexityAdapter();
+    const summary = await adapter.getProductSummary(productName);
+
+    const processingTime = Date.now() - startTime;
 
     // 검색 이력 저장
-    await dbService.saveSearchHistory(
+    await getDBService().saveSearchHistory(
       session.sessionId,
       productName,
       'product',
       productName,
-      summary
+      summary,
+      processingTime,
+      true // success
     );
-
-    const processingTime = Date.now() - startTime;
 
     return res.json({
       sessionId: session.sessionId,
@@ -100,31 +125,27 @@ router.post('/price', async (req, res) => {
       return res.status(400).json({ error: '제품명(productName)이 필요합니다.' });
     }
 
-    if (!perplexityAdapter) {
-      return res.status(503).json({ error: 'Perplexity API가 설정되지 않았습니다.' });
-    }
-
     logger.info('가격 비교 분석 시작', { productName, sessionId });
 
-    // 가격 비교 정보 가져오기
-    const priceComparison = await perplexityAdapter.getPriceComparison(productName);
-
     // 세션 처리
-    let session = sessionId ? await dbService.getSession(sessionId) : null;
-    if (!session) {
-      session = await dbService.createSession(productName, req.headers['user-agent'], req.ip);
-    }
+    const session = await getOrCreateSession(productName, sessionId, req.headers['user-agent']);
+
+    // 가격 비교 정보 가져오기
+    const adapter = getPerplexityAdapter();
+    const priceComparison = await adapter.getPriceComparison(productName);
+
+    const processingTime = Date.now() - startTime;
 
     // 검색 이력 저장
-    await dbService.saveSearchHistory(
+    await getDBService().saveSearchHistory(
       session.sessionId,
       productName,
       'price',
       productName,
-      priceComparison
+      priceComparison,
+      processingTime,
+      true // success
     );
-
-    const processingTime = Date.now() - startTime;
 
     return res.json({
       sessionId: session.sessionId,
@@ -155,31 +176,27 @@ router.post('/reviews', async (req, res) => {
       return res.status(400).json({ error: '제품명(productName)이 필요합니다.' });
     }
 
-    if (!perplexityAdapter) {
-      return res.status(503).json({ error: 'Perplexity API가 설정되지 않았습니다.' });
-    }
-
     logger.info('리뷰 분석 시작', { productName, sessionId });
 
-    // 리뷰 요약 정보 가져오기
-    const reviewDigest = await perplexityAdapter.getReviewDigest(productName);
-
     // 세션 처리
-    let session = sessionId ? await dbService.getSession(sessionId) : null;
-    if (!session) {
-      session = await dbService.createSession(productName, req.headers['user-agent'], req.ip);
-    }
+    const session = await getOrCreateSession(productName, sessionId, req.headers['user-agent']);
+
+    // 리뷰 요약 정보 가져오기
+    const adapter = getPerplexityAdapter();
+    const reviewDigest = await adapter.getReviewDigest(productName);
+
+    const processingTime = Date.now() - startTime;
 
     // 검색 이력 저장
-    await dbService.saveSearchHistory(
+    await getDBService().saveSearchHistory(
       session.sessionId,
       productName,
       'review',
       productName,
-      reviewDigest
+      reviewDigest,
+      processingTime,
+      true // success
     );
-
-    const processingTime = Date.now() - startTime;
 
     return res.json({
       sessionId: session.sessionId,
@@ -211,15 +228,11 @@ router.post('/score', async (req, res) => {
       return res.status(400).json({ error: '제품명(productName)이 필요합니다.' });
     }
 
-    if (!perplexityAdapter) {
-      return res.status(503).json({ error: 'Perplexity API가 설정되지 않았습니다.' });
-    }
-
     logger.info('종합 분석 시작', { productName, sessionId, useCache });
 
     // 캐시 확인
     if (useCache) {
-      const cached = await dbService.getAnalysisCache(productName);
+      const cached = await getDBService().getAnalysisCache(productName);
       if (cached) {
         logger.info('캐시된 분석 결과 반환', { productName });
         return res.json({
@@ -230,16 +243,16 @@ router.post('/score', async (req, res) => {
     }
 
     // 세션 처리
-    let session = sessionId ? await dbService.getSession(sessionId) : null;
-    if (!session) {
-      session = await dbService.createSession(productName, req.headers['user-agent'], req.ip);
-    }
+    const session = await getOrCreateSession(productName, sessionId, req.headers['user-agent']);
+
+    // Perplexity Adapter 초기화
+    const adapter = getPerplexityAdapter();
 
     // 병렬로 모든 분석 수행
     const [summary, priceComparison, reviewDigest] = await Promise.all([
-      perplexityAdapter.getProductSummary(productName),
-      perplexityAdapter.getPriceComparison(productName),
-      perplexityAdapter.getReviewDigest(productName),
+      adapter.getProductSummary(productName),
+      adapter.getPriceComparison(productName),
+      adapter.getReviewDigest(productName),
     ]);
 
     // 위험도 계산
@@ -259,20 +272,22 @@ router.post('/score', async (req, res) => {
       processingTime,
     };
 
-    // 세션에 결과 저장
-    await dbService.updateSessionWithResult(session.sessionId, analysisResult);
-
-    // 검색 이력 저장
-    await dbService.saveSearchHistory(
-      session.sessionId,
-      productName,
-      'score',
-      productName,
-      analysisResult
-    );
+    // 세션에 결과 저장 및 검색 이력 저장 (병렬 실행)
+    await Promise.all([
+      getDBService().updateSessionWithResult(session.sessionId, analysisResult),
+      getDBService().saveSearchHistory(
+        session.sessionId,
+        productName,
+        'risk',
+        productName,
+        analysisResult,
+        processingTime,
+        true // success
+      ),
+    ]);
 
     // 캐시 저장 (60분)
-    await dbService.saveAnalysisCache(productName, analysisResult, 60);
+    await getDBService().saveAnalysisCache(productName, analysisResult, 60);
 
     logger.info('종합 분석 완료', {
       productName,
@@ -301,14 +316,14 @@ router.get('/session/:sessionId', async (req, res) => {
   try {
     const { sessionId } = req.params;
 
-    const session = await dbService.getSession(sessionId);
+    const session = await getDBService().getSession(sessionId);
 
     if (!session) {
       return res.status(404).json({ error: '세션을 찾을 수 없습니다.' });
     }
 
     // 세션의 검색 이력도 함께 조회
-    const history = await dbService.getSessionHistory(sessionId);
+    const history = await getDBService().getSessionHistory(sessionId);
 
     return res.json({
       session,
