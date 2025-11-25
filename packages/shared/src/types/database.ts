@@ -2,7 +2,7 @@
  * DynamoDB 스키마 및 데이터베이스 관련 타입
  */
 
-import { ProductAnalysisResult, PerplexitySearchResponse } from './perplexity.js';
+import { ProductAnalysisResult } from './perplexity.js';
 
 /**
  * 검색 세션 상태
@@ -73,7 +73,7 @@ export interface SearchHistory {
   query: string; // Perplexity에 전송한 쿼리
 
   // 응답 데이터
-  response: PerplexitySearchResponse; // Perplexity 원본 응답
+  response: unknown; // 검색 응답 데이터 (다양한 타입 지원)
   processingTime: number; // 처리 시간 (ms)
 
   // 메타데이터

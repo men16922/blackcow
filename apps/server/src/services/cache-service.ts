@@ -108,7 +108,7 @@ export class CacheService {
         ttl,
       };
 
-      await this.dbClient.putItem('AnalysisCache', cacheItem as Record<string, unknown>);
+      await this.dbClient.putItem('AnalysisCache', cacheItem as unknown as Record<string, unknown>);
 
       logger.info('캐시 저장 완료', {
         productName,
@@ -227,7 +227,7 @@ export class CacheService {
 
       // ExpiresAtIndex를 사용하여 만료된 항목 조회
       const now = getCurrentTimestamp();
-      const expiredItems = await this.dbClient.query('AnalysisCache', {
+      const expiredItems = await this.dbClient.query<AnalysisCache>('AnalysisCache', {
         IndexName: 'ExpiresAtIndex',
         KeyConditionExpression: 'expiresAt < :now',
         ExpressionAttributeValues: {
@@ -269,7 +269,7 @@ export class CacheService {
     logger.warn('전체 캐시 삭제 시작 (개발/테스트 전용)');
 
     try {
-      const allItems = await this.dbClient.scan('AnalysisCache');
+      const allItems = await this.dbClient.scan<AnalysisCache>('AnalysisCache');
 
       if (!allItems || allItems.length === 0) {
         logger.info('삭제할 캐시 없음');
