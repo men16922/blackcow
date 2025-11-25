@@ -11,6 +11,7 @@
 ### 1. 변경사항 분석 단계
 
 다음 명령어들을 **병렬로** 실행하여 현재 상태를 파악합니다:
+
 ```bash
 git status
 git diff develop...HEAD --stat
@@ -19,6 +20,7 @@ git branch --show-current
 ```
 
 분석할 내용:
+
 - 수정된 파일 목록
 - 새로 추가된 파일 목록
 - 삭제된 파일 목록
@@ -30,6 +32,7 @@ git branch --show-current
 변경사항을 분석하여 적절한 커밋 메시지를 작성합니다.
 
 **커밋 메시지 형식**:
+
 ```
 <type>(<scope>): <subject>
 
@@ -41,6 +44,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
 **Type 분류**:
+
 - `feat`: 새로운 기능 추가
 - `fix`: 버그 수정
 - `refactor`: 코드 리팩토링
@@ -55,11 +59,13 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 **IMPORTANT**: 다음 순서를 **반드시** 따라야 합니다:
 
 1. **먼저** 변경사항 스테이징:
+
    ```bash
    git add .
    ```
 
 2. **그 다음** 커밋 생성:
+
    ```bash
    git commit -m "$(cat <<'EOF'
    <커밋 메시지>
@@ -73,6 +79,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
    ```
 
 **절대 하지 말 것**:
+
 - ❌ `git commit` 전에 `git push` 실행
 - ❌ staged 변경사항 없이 커밋
 - ❌ --amend 사용 (명시적 요청 제외)
@@ -95,7 +102,8 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 5. **✅ 체크리스트**: 완료된 항목에 [x] 표시
 
 **작성 예시**:
-```markdown
+
+````markdown
 # Pull Request
 
 ## 📝 개요
@@ -141,8 +149,10 @@ Closes #
    docker-compose -f docker-compose.local.yml up -d
    yarn dev:local
    ```
+````
 
 2. API 테스트 실행
+
    ```bash
    node tests/api-test.js
    ```
@@ -182,7 +192,8 @@ Closes #
 >
 > - 이 PR의 주요 변경 사항은 타입 안정성 개선과 DynamoDB API 최적화입니다.
 > - 특히 `apps/server/src/db/dynamodb-client.ts`의 Generic CRUD 메서드를 중점적으로 봐주세요.
-```
+
+````
 
 ### 5. GitHub PR 생성
 
@@ -197,11 +208,12 @@ gh pr create \
 <PR 본문>
 EOF
 )"
-```
+````
 
 **PR 제목 형식**: `[TYPE] 간결한 요약 (최대 50자)`
 
 예시:
+
 - `[REFACTOR] 백엔드 타입 안정성 개선 및 DynamoDB 최적화`
 - `[FEAT] Perplexity API 기반 제품 분석 기능 구현`
 - `[FIX] IP 수집 제거 및 보안 강화`
@@ -233,11 +245,13 @@ PR 생성 후 다음 정보를 사용자에게 보고합니다:
 ## 오류 처리
 
 ### 브랜치가 이미 푸시된 경우
+
 ```bash
 git push origin <branch-name>
 ```
 
 ### 충돌이 있는 경우
+
 ```bash
 git fetch origin develop
 git rebase origin/develop
@@ -246,7 +260,9 @@ git push -f origin <branch-name>
 ```
 
 ### gh CLI가 없는 경우
+
 사용자에게 다음 가이드 제공:
+
 1. GitHub 웹사이트에서 수동으로 PR 생성
 2. 제공된 PR 본문 복사/붙여넣기
 

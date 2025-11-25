@@ -136,6 +136,7 @@ yarn setup:dynamodb
 ```
 
 생성되는 테이블:
+
 - **BlackCow_SearchSessions**: 검색 세션 정보 저장
 - **BlackCow_SearchHistory**: 검색 이력 저장
 - **BlackCow_AnalysisCache**: 분석 결과 캐시

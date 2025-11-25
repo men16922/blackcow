@@ -332,10 +332,7 @@ export class DynamoDBService {
   /**
    * Generic: 테이블에 아이템 저장
    */
-  async putItem<T extends Record<string, unknown>>(
-    tableName: string,
-    item: T
-  ): Promise<void> {
+  async putItem<T extends Record<string, unknown>>(tableName: string, item: T): Promise<void> {
     try {
       await this.client.send(
         new PutCommand({

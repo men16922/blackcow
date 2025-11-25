@@ -12,14 +12,14 @@
 
 ### 주요 파라미터
 
-| 파라미터 | 타입 | 설명 | 기본값 |
-|---------|------|------|--------|
-| `model` | string | 사용할 모델 (예: pplx-7b-online) | 필수 |
-| `query` | string or string[] | 검색 쿼리 | 필수 |
-| `max_results` | number | 최대 결과 수 | 10 |
-| `country` | string | 국가 코드 (예: KR) | - |
-| `search_recency_filter` | string | 검색 기간 (day, week, month, year) | - |
-| `search_domain_filter` | string[] | 특정 도메인만 검색 | - |
+| 파라미터                | 타입               | 설명                               | 기본값 |
+| ----------------------- | ------------------ | ---------------------------------- | ------ |
+| `model`                 | string             | 사용할 모델 (예: pplx-7b-online)   | 필수   |
+| `query`                 | string or string[] | 검색 쿼리                          | 필수   |
+| `max_results`           | number             | 최대 결과 수                       | 10     |
+| `country`               | string             | 국가 코드 (예: KR)                 | -      |
+| `search_recency_filter` | string             | 검색 기간 (day, week, month, year) | -      |
+| `search_domain_filter`  | string[]           | 특정 도메인만 검색                 | -      |
 
 ---
 
@@ -410,14 +410,18 @@ function detectPlatform(url: string): string {
 
 ```typescript
 const positiveKeywords = [
-  '좋아요', '만족', '추천', '훌륭', '최고',
-  '가성비', '품질', '편리', '빠른'
+  '좋아요',
+  '만족',
+  '추천',
+  '훌륭',
+  '최고',
+  '가성비',
+  '품질',
+  '편리',
+  '빠른',
 ];
 
-const negativeKeywords = [
-  '실망', '불만', '최악', '별로', '불편',
-  '느림', '비싸', '고장', '환불'
-];
+const negativeKeywords = ['실망', '불만', '최악', '별로', '불편', '느림', '비싸', '고장', '환불'];
 
 // 키워드 빈도 계산
 let positiveCount = 0;
@@ -430,9 +434,7 @@ allText.split(' ').forEach(word => {
 
 // 감정 점수 계산 (0-100)
 const total = positiveCount + negativeCount;
-const sentimentScore = total > 0
-  ? Math.round((positiveCount / total) * 100)
-  : 50;
+const sentimentScore = total > 0 ? Math.round((positiveCount / total) * 100) : 50;
 
 // 전반적인 감정 분류
 let overallSentiment: 'positive' | 'negative' | 'mixed' | 'neutral';
@@ -450,19 +452,17 @@ const average = prices.reduce((a, b) => a + b, 0) / prices.length;
 
 // 중앙값
 const sorted = [...prices].sort((a, b) => a - b);
-const median = sorted.length % 2 === 0
-  ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
-  : sorted[Math.floor(sorted.length / 2)];
+const median =
+  sorted.length % 2 === 0
+    ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+    : sorted[Math.floor(sorted.length / 2)];
 
 // 표준편차
-const variance = prices.reduce((sum, val) =>
-  sum + Math.pow(val - average, 2), 0) / prices.length;
+const variance = prices.reduce((sum, val) => sum + Math.pow(val - average, 2), 0) / prices.length;
 const stdDev = Math.sqrt(variance);
 
 // 이상치 탐지 (평균 ± 2σ 밖)
-const outliers = prices.filter(price =>
-  Math.abs(price - average) > 2 * stdDev
-);
+const outliers = prices.filter(price => Math.abs(price - average) > 2 * stdDev);
 ```
 
 ---
@@ -487,20 +487,20 @@ const outliers = prices.filter(price =>
 
 ```typescript
 // 최근 데이터만 검색
-search_recency_filter: 'week'  // 또는 'month'
+search_recency_filter: 'week'; // 또는 'month'
 
 // 특정 도메인만 검색
-search_domain_filter: ['coupang.com', 'shopping.naver.com']
+search_domain_filter: ['coupang.com', 'shopping.naver.com'];
 ```
 
 ### 4. 결과 수 조절
 
 ```typescript
 // 가격 비교는 많은 결과 필요
-max_results: 15  // 가격 비교
+max_results: 15; // 가격 비교
 
 // 리뷰 요약은 적은 결과로도 충분
-max_results: 10  // 리뷰 요약
+max_results: 10; // 리뷰 요약
 ```
 
 ---

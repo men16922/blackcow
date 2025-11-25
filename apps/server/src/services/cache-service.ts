@@ -161,9 +161,13 @@ export class CacheService {
     try {
       await this.dbClient.incrementField('AnalysisCache', { cacheKey }, 'hitCount', 1);
 
-      await this.dbClient.updateItem('AnalysisCache', { cacheKey }, {
-        lastAccessedAt: getCurrentTimestamp(),
-      });
+      await this.dbClient.updateItem(
+        'AnalysisCache',
+        { cacheKey },
+        {
+          lastAccessedAt: getCurrentTimestamp(),
+        }
+      );
 
       logger.debug('히트 카운트 업데이트 완료', { cacheKey });
     } catch (error) {
@@ -272,9 +276,7 @@ export class CacheService {
         return;
       }
 
-      const deletePromises = allItems.map((item: AnalysisCache) =>
-        this.invalidate(item.cacheKey)
-      );
+      const deletePromises = allItems.map((item: AnalysisCache) => this.invalidate(item.cacheKey));
 
       await Promise.all(deletePromises);
 

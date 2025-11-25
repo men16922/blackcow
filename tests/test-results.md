@@ -6,11 +6,11 @@
 
 ## 📊 테스트 결과 요약
 
-| 구분 | 결과 |
-|------|------|
-| **Total Tests** | 7 |
-| **✅ Passed** | 7 |
-| **❌ Failed** | 0 |
+| 구분             | 결과     |
+| ---------------- | -------- |
+| **Total Tests**  | 7        |
+| **✅ Passed**    | 7        |
+| **❌ Failed**    | 0        |
 | **Success Rate** | **100%** |
 
 ---
@@ -24,6 +24,7 @@
 **결과**: 성공
 
 **응답**:
+
 ```json
 {
   "status": "ok",
@@ -32,6 +33,7 @@
 ```
 
 **검증 항목**:
+
 - HTTP 상태 코드: 200 OK
 - 응답 형식: JSON
 - status 필드: "ok"
@@ -44,6 +46,7 @@
 **엔드포인트**: `POST /api/analyze/product`
 
 **요청 데이터**:
+
 ```json
 {
   "productName": "갤럭시 버즈2 프로"
@@ -53,6 +56,7 @@
 **결과**: 성공
 
 **주요 응답 데이터**:
+
 - **Session ID**: `4b05a74f-4d08-4ff8-a417-fbdca04f896d`
 - **Product Name**: 갤럭시 버즈2 프로
 - **Processing Time**: 561ms
@@ -60,6 +64,7 @@
 - **Price Range**: ₩3,000 ~ ₩319,000
 
 **제품 정보 요약**:
+
 - 삼성 갤럭시 버즈 시리즈 6번째 제품 (Pro 모델 2세대)
 - 주요 특징: 24비트 Hi-Fi 오디오, ANC 기능, IPX7 방수
 - 색상: 퍼플, 블랙, 화이트 (무광)
@@ -67,6 +72,7 @@
 - 배터리: 이어버드 61mAh, 케이스 515mAh
 
 **검증 항목**:
+
 - HTTP 상태 코드: 200 OK
 - 세션 ID 생성 확인
 - Perplexity API 응답 포함
@@ -79,6 +85,7 @@
 **엔드포인트**: `POST /api/analyze/price`
 
 **요청 데이터**:
+
 ```json
 {
   "productName": "갤럭시 버즈2 프로",
@@ -90,17 +97,18 @@
 
 **가격 비교 데이터**:
 
-| 플랫폼 | 가격 | 최종 업데이트 |
-|--------|------|---------------|
-| 11번가 | ₩3,500 | 2025-11-20 |
-| 쿠팡 | ₩24,800 | 2025-11-21 |
-| 옥션 | ₩28,800 | 2025-11-16 |
-| 쿠팡 | ₩39,000 | 2025-11-19 |
-| G마켓 | ₩149,800 | 2025-11-18 |
-| 쿠팡 | ₩269,000 | 2025-11-16 |
-| 쿠팡 | ₩941,200 | 2025-11-22 |
+| 플랫폼 | 가격     | 최종 업데이트 |
+| ------ | -------- | ------------- |
+| 11번가 | ₩3,500   | 2025-11-20    |
+| 쿠팡   | ₩24,800  | 2025-11-21    |
+| 옥션   | ₩28,800  | 2025-11-16    |
+| 쿠팡   | ₩39,000  | 2025-11-19    |
+| G마켓  | ₩149,800 | 2025-11-18    |
+| 쿠팡   | ₩269,000 | 2025-11-16    |
+| 쿠팡   | ₩941,200 | 2025-11-22    |
 
 **통계 분석**:
+
 - **평균 가격**: ₩208,014
 - **중간값**: ₩39,000
 - **최저가**: ₩3,500
@@ -108,9 +116,11 @@
 - **표준편차**: ₩311,849
 
 **이상값 (Outliers)**:
+
 - 쿠팡 ₩941,200 (평균의 약 4.5배)
 
 **검증 항목**:
+
 - HTTP 상태 코드: 200 OK
 - 여러 플랫폼의 가격 수집
 - 통계 계산 정확성
@@ -123,6 +133,7 @@
 **엔드포인트**: `POST /api/analyze/reviews`
 
 **요청 데이터**:
+
 ```json
 {
   "productName": "갤럭시 버즈2 프로",
@@ -133,10 +144,12 @@
 **결과**: 성공
 
 **리뷰 분석 결과**:
+
 - **전반적 감정**: Positive (긍정)
 - **감정 점수**: 92/100
 
 **주요 장점 (Common Praises)**:
+
 1. 디자인이 매우 만족스럽고 세련됨
 2. 다양한 장르에서 뛰어난 음질 (클래식 ~ EDM)
 3. 저음이 뭉개지지 않고 선명한 밸런스
@@ -144,16 +157,19 @@
 5. 배터리 성능과 충전 편리성 우수
 
 **주요 단점 (Common Complaints)**:
+
 - 크게 언급된 단점 없음
 - 일부 착용감 관련 개인차 존재
 
 **핵심 인사이트**:
+
 - 인체공학적 디자인으로 장시간 착용 가능
 - 노이즈 캔슬링 기능 인상적
 - 삼성 Wearable 앱을 통한 개인 맞춤 설정 가능
 - 가격 대비 매우 만족스러운 제품
 
 **검증 항목**:
+
 - HTTP 상태 코드: 200 OK
 - 감정 분석 정확성
 - 리뷰 요약 품질
@@ -166,6 +182,7 @@
 **엔드포인트**: `POST /api/analyze/score`
 
 **요청 데이터**:
+
 ```json
 {
   "productName": "갤럭시 버즈2 프로",
@@ -176,6 +193,7 @@
 **결과**: 성공
 
 **위험도 분석**:
+
 - **Session ID**: `f6ddd8ae-7a65-4bc0-b89a-48a1e600cc9d`
 - **Risk Score**: 52/100
 - **Risk Level**: MEDIUM (보통)
@@ -184,10 +202,12 @@
 - **From Cache**: false
 
 **위험 요소**:
+
 1. **PRICE** (가격): 이상값 존재 (₩941,200)
 2. **PLATFORM** (플랫폼): 다양한 플랫폼에서 가격 편차 큼
 
 **검증 항목**:
+
 - HTTP 상태 코드: 200 OK
 - 3개 API 병렬 호출 성공 (product, price, review)
 - 위험도 점수 계산 로직 작동
@@ -200,6 +220,7 @@
 **엔드포인트**: `POST /api/analyze/score`
 
 **요청 데이터**:
+
 ```json
 {
   "productName": "갤럭시 버즈2 프로",
@@ -210,17 +231,20 @@
 **결과**: 성공 (캐시 히트!)
 
 **응답 데이터**:
+
 - **Processing Time**: 540ms (캐시에서 조회)
 - **From Cache**: true
 - **Risk Score**: 52 (동일한 결과)
 
 **검증 항목**:
+
 - HTTP 상태 코드: 200 OK
 - 캐시 히트 확인 (`fromCache: true`)
 - 캐시된 데이터 정확성
 - DynamoDB AnalysisCache 테이블 작동
 
 **캐시 성능**:
+
 - 처음 분석: 540ms (API 3번 호출)
 - 캐시된 분석: 540ms (DB 조회만)
 - API 호출 생략으로 비용 절감
@@ -236,11 +260,13 @@
 **결과**: 성공
 
 **응답 데이터**:
+
 - 세션 정보 조회 성공
 - 분석 결과 (summary, priceComparison, reviewDigest, riskScore) 포함
 - 생성 시간, IP 주소 등 메타데이터 포함
 
 **검증 항목**:
+
 - HTTP 상태 코드: 200 OK
 - 세션 ID로 데이터 조회 성공
 - 완전한 분석 결과 반환
@@ -253,17 +279,21 @@
 ### Issue #1: DynamoDB 키 스키마 불일치
 
 **문제**:
+
 ```
 ValidationException: The number of conditions on the keys is invalid
 ```
 
 **원인**:
+
 - SearchSessions 테이블이 Composite Key (sessionId + createdAt)를 사용하도록 생성되어 있었음
 - 코드는 Simple Key (sessionId만)를 사용하도록 구현됨
 - GetItem, UpdateItem 호출 시 키 조건 불일치로 에러 발생
 
 **해결 방법**:
+
 1. 기존 테이블 삭제
+
 ```bash
 aws dynamodb delete-table \
   --table-name BlackCow_SearchSessions \
@@ -271,6 +301,7 @@ aws dynamodb delete-table \
 ```
 
 2. Simple Key로 테이블 재생성
+
 ```bash
 aws dynamodb create-table \
   --table-name BlackCow_SearchSessions \
@@ -286,14 +317,17 @@ aws dynamodb create-table \
 ### Issue #2: AnalysisCache 테이블 미생성
 
 **문제**:
+
 ```
 ResourceNotFoundException: Cannot do operations on a non-existent table
 ```
 
 **원인**:
+
 - AnalysisCache 테이블이 로컬 DynamoDB에 생성되지 않음
 
 **해결 방법**:
+
 ```bash
 aws dynamodb create-table \
   --table-name BlackCow_AnalysisCache \
@@ -310,15 +344,15 @@ aws dynamodb create-table \
 
 ### API 응답 시간
 
-| API | 평균 응답 시간 | 비고 |
-|-----|---------------|------|
-| Health Check | ~10ms | 매우 빠름 |
-| Product Analysis | ~560ms | Perplexity API 1회 호출 |
-| Price Comparison | ~850ms | Perplexity API 1회 호출 |
-| Review Analysis | ~500ms | Perplexity API 1회 호출 |
-| Comprehensive Score | ~540ms | Perplexity API 3회 병렬 호출 |
-| Cached Score | ~5ms | 캐시 히트 시 매우 빠름 |
-| Session Retrieval | ~10ms | DynamoDB GetItem |
+| API                 | 평균 응답 시간 | 비고                         |
+| ------------------- | -------------- | ---------------------------- |
+| Health Check        | ~10ms          | 매우 빠름                    |
+| Product Analysis    | ~560ms         | Perplexity API 1회 호출      |
+| Price Comparison    | ~850ms         | Perplexity API 1회 호출      |
+| Review Analysis     | ~500ms         | Perplexity API 1회 호출      |
+| Comprehensive Score | ~540ms         | Perplexity API 3회 병렬 호출 |
+| Cached Score        | ~5ms           | 캐시 히트 시 매우 빠름       |
+| Session Retrieval   | ~10ms          | DynamoDB GetItem             |
 
 ### Perplexity API 호출 통계
 
@@ -372,6 +406,7 @@ aws dynamodb create-table \
 ### Test #5 상세 (Comprehensive Score)
 
 **Perplexity API 병렬 호출**:
+
 ```
 [10:03:47] 종합 분석 시작
 [10:03:47] 세션 생성됨: f6ddd8ae-7a65-4bc0-b89a-48a1e600cc9d
@@ -386,6 +421,7 @@ aws dynamodb create-table \
 ```
 
 **위험도 계산 로직**:
+
 ```typescript
 // 가격 위험도: 이상값 존재 → +30점
 // 플랫폼 위험도: 가격 편차 큼 → +22점
@@ -396,6 +432,7 @@ aws dynamodb create-table \
 ### Test #6 상세 (Cached Score)
 
 **캐시 히트 플로우**:
+
 ```
 [10:03:50] 종합 분석 시작 (useCache: true)
 [10:03:50] 캐시 키 생성: product:갤럭시버즈2프로
@@ -405,6 +442,7 @@ aws dynamodb create-table \
 ```
 
 **비용 절감 효과**:
+
 - Perplexity API 호출 3회 절약
 - 응답 시간 약 98% 단축 (540ms → 10ms)
 - API 비용 절감 (Perplexity API 과금 방지)
@@ -466,16 +504,18 @@ aws dynamodb create-table \
 ### 1. DynamoDB 스키마 설계
 
 **교훈**:
+
 - 데이터베이스 스키마와 코드 구현이 일치해야 함
 - 초기 설계 단계에서 접근 패턴을 명확히 정의
 
 **베스트 프랙티스**:
+
 ```typescript
 // 키 스키마를 코드에 명시적으로 정의
 const TABLE_SCHEMA = {
   sessions: {
     primaryKey: 'sessionId', // HASH
-    sortKey: undefined,      // RANGE (없음)
+    sortKey: undefined, // RANGE (없음)
   },
   history: {
     primaryKey: 'historyId',
@@ -487,10 +527,12 @@ const TABLE_SCHEMA = {
 ### 2. 캐시 전략
 
 **교훈**:
+
 - 적절한 캐시 전략으로 비용과 성능 크게 개선
 - TTL 설정으로 자동 데이터 정리
 
 **베스트 프랙티스**:
+
 - 제품 분석 결과: 24시간 캐시
 - 가격 정보: 1시간 캐시 (가격 변동 빈번)
 - 리뷰 분석: 12시간 캐시
@@ -498,10 +540,12 @@ const TABLE_SCHEMA = {
 ### 3. API 병렬 처리
 
 **교훈**:
+
 - Promise.all()을 사용한 병렬 처리로 응답 시간 단축
 - 독립적인 API 호출은 병렬로 실행
 
 **베스트 프랙티스**:
+
 ```typescript
 // 나쁜 예: 순차 실행 (1500ms)
 const product = await getProduct();
@@ -509,11 +553,7 @@ const price = await getPrice();
 const review = await getReview();
 
 // 좋은 예: 병렬 실행 (500ms)
-const [product, price, review] = await Promise.all([
-  getProduct(),
-  getPrice(),
-  getReview(),
-]);
+const [product, price, review] = await Promise.all([getProduct(), getPrice(), getReview()]);
 ```
 
 ---

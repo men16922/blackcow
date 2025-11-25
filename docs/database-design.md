@@ -12,34 +12,35 @@
 
 #### 키 스키마
 
-| 속성 | 타입 | 키 타입 | 설명 |
-|------|------|---------|------|
-| sessionId | String | HASH (PK) | UUID v4 형식의 세션 고유 ID |
-| createdAt | String | RANGE (SK) | ISO 8601 형식의 생성 시간 |
+| 속성      | 타입   | 키 타입    | 설명                        |
+| --------- | ------ | ---------- | --------------------------- |
+| sessionId | String | HASH (PK)  | UUID v4 형식의 세션 고유 ID |
+| createdAt | String | RANGE (SK) | ISO 8601 형식의 생성 시간   |
 
 #### Global Secondary Index (GSI)
 
 **ProductNameIndex**
+
 - Partition Key: `productName` (String)
 - Sort Key: `createdAt` (String)
 - 목적: 특정 제품에 대한 모든 세션 조회
 
 #### 속성
 
-| 속성 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| sessionId | String | ✅ | 세션 고유 ID (UUID v4) |
-| createdAt | String | ✅ | 세션 생성 시간 (ISO 8601) |
-| productName | String | ✅ | 분석 대상 제품명 |
-| productUrl | String | ❌ | 원본 제품 URL |
-| status | String | ✅ | 세션 상태: `pending`, `analyzing`, `completed`, `failed` |
-| analysisResult | Object | ❌ | 분석 결과 (ProductAnalysisResult) |
-| errorMessage | String | ❌ | 실패 시 에러 메시지 |
-| updatedAt | String | ✅ | 마지막 업데이트 시간 (ISO 8601) |
-| userAgent | String | ❌ | 사용자 브라우저 정보 |
-| ipAddress | String | ❌ | 사용자 IP 주소 |
-| userId | String | ❌ | 향후 사용자 인증 추가 시 사용 |
-| ttl | Number | ❌ | TTL (Unix timestamp, 초 단위) - 30일 후 자동 삭제 |
+| 속성           | 타입   | 필수 | 설명                                                     |
+| -------------- | ------ | ---- | -------------------------------------------------------- |
+| sessionId      | String | ✅   | 세션 고유 ID (UUID v4)                                   |
+| createdAt      | String | ✅   | 세션 생성 시간 (ISO 8601)                                |
+| productName    | String | ✅   | 분석 대상 제품명                                         |
+| productUrl     | String | ❌   | 원본 제품 URL                                            |
+| status         | String | ✅   | 세션 상태: `pending`, `analyzing`, `completed`, `failed` |
+| analysisResult | Object | ❌   | 분석 결과 (ProductAnalysisResult)                        |
+| errorMessage   | String | ❌   | 실패 시 에러 메시지                                      |
+| updatedAt      | String | ✅   | 마지막 업데이트 시간 (ISO 8601)                          |
+| userAgent      | String | ❌   | 사용자 브라우저 정보                                     |
+| ipAddress      | String | ❌   | 사용자 IP 주소                                           |
+| userId         | String | ❌   | 향후 사용자 인증 추가 시 사용                            |
+| ttl            | Number | ❌   | TTL (Unix timestamp, 초 단위) - 30일 후 자동 삭제        |
 
 #### 데이터 예시
 
@@ -53,10 +54,18 @@
   "analysisResult": {
     "sessionId": "550e8400-e29b-41d4-a716-446655440000",
     "productName": "삼성 갤럭시 버즈2 프로",
-    "summary": { /* ... */ },
-    "priceComparison": { /* ... */ },
-    "reviewDigest": { /* ... */ },
-    "riskScore": { /* ... */ },
+    "summary": {
+      /* ... */
+    },
+    "priceComparison": {
+      /* ... */
+    },
+    "reviewDigest": {
+      /* ... */
+    },
+    "riskScore": {
+      /* ... */
+    },
     "analyzedAt": "2025-11-22T10:30:15.000Z",
     "processingTime": 8500
   },
@@ -81,38 +90,40 @@ Perplexity API 호출 이력을 저장합니다. 각 세션은 여러 검색 이
 
 #### 키 스키마
 
-| 속성 | 타입 | 키 타입 | 설명 |
-|------|------|---------|------|
-| historyId | String | HASH (PK) | UUID v4 형식의 이력 고유 ID |
-| createdAt | String | RANGE (SK) | ISO 8601 형식의 생성 시간 |
+| 속성      | 타입   | 키 타입    | 설명                        |
+| --------- | ------ | ---------- | --------------------------- |
+| historyId | String | HASH (PK)  | UUID v4 형식의 이력 고유 ID |
+| createdAt | String | RANGE (SK) | ISO 8601 형식의 생성 시간   |
 
 #### Global Secondary Indexes (GSI)
 
 **SessionIndex**
+
 - Partition Key: `sessionId` (String)
 - Sort Key: `createdAt` (String)
 - 목적: 특정 세션의 모든 검색 이력 조회
 
 **SearchTypeIndex**
+
 - Partition Key: `searchType` (String)
 - Sort Key: `createdAt` (String)
 - 목적: 검색 타입별 통계 및 분석
 
 #### 속성
 
-| 속성 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| historyId | String | ✅ | 이력 고유 ID (UUID v4) |
-| createdAt | String | ✅ | 생성 시간 (ISO 8601) |
-| sessionId | String | ✅ | 관련 세션 ID |
-| productName | String | ✅ | 검색한 제품명 |
-| searchType | String | ✅ | 검색 타입: `product`, `price`, `review`, `risk` |
-| query | String | ✅ | Perplexity에 전송한 실제 쿼리 |
-| response | Object | ✅ | Perplexity 원본 응답 (PerplexitySearchResponse) |
-| processingTime | Number | ✅ | 처리 시간 (밀리초) |
-| success | Boolean | ✅ | 성공 여부 |
-| errorMessage | String | ❌ | 실패 시 에러 메시지 |
-| ttl | Number | ❌ | TTL (Unix timestamp, 초 단위) - 90일 후 자동 삭제 |
+| 속성           | 타입    | 필수 | 설명                                              |
+| -------------- | ------- | ---- | ------------------------------------------------- |
+| historyId      | String  | ✅   | 이력 고유 ID (UUID v4)                            |
+| createdAt      | String  | ✅   | 생성 시간 (ISO 8601)                              |
+| sessionId      | String  | ✅   | 관련 세션 ID                                      |
+| productName    | String  | ✅   | 검색한 제품명                                     |
+| searchType     | String  | ✅   | 검색 타입: `product`, `price`, `review`, `risk`   |
+| query          | String  | ✅   | Perplexity에 전송한 실제 쿼리                     |
+| response       | Object  | ✅   | Perplexity 원본 응답 (PerplexitySearchResponse)   |
+| processingTime | Number  | ✅   | 처리 시간 (밀리초)                                |
+| success        | Boolean | ✅   | 성공 여부                                         |
+| errorMessage   | String  | ❌   | 실패 시 에러 메시지                               |
+| ttl            | Number  | ❌   | TTL (Unix timestamp, 초 단위) - 90일 후 자동 삭제 |
 
 #### 데이터 예시
 
@@ -154,30 +165,31 @@ Perplexity API 호출 이력을 저장합니다. 각 세션은 여러 검색 이
 
 #### 키 스키마
 
-| 속성 | 타입 | 키 타입 | 설명 |
-|------|------|---------|------|
-| cacheKey | String | HASH (PK) | hash(productName + version) |
-| productName | String | RANGE (SK) | 제품명 |
+| 속성        | 타입   | 키 타입    | 설명                        |
+| ----------- | ------ | ---------- | --------------------------- |
+| cacheKey    | String | HASH (PK)  | hash(productName + version) |
+| productName | String | RANGE (SK) | 제품명                      |
 
 #### Global Secondary Index (GSI)
 
 **ExpiresAtIndex**
+
 - Partition Key: `expiresAt` (String)
 - 목적: 만료된 캐시 항목 정리 (배치 작업)
 
 #### 속성
 
-| 속성 | 타입 | 필수 | 설명 |
-|------|------|------|------|
-| cacheKey | String | ✅ | 캐시 키 (productName + version의 해시) |
-| productName | String | ✅ | 제품명 |
-| analysisResult | Object | ✅ | 분석 결과 (ProductAnalysisResult) |
-| createdAt | String | ✅ | 생성 시간 (ISO 8601) |
-| expiresAt | String | ✅ | 만료 시간 (ISO 8601, 24시간 후) |
-| hitCount | Number | ✅ | 캐시 히트 횟수 |
-| lastAccessedAt | String | ✅ | 마지막 접근 시간 (ISO 8601) |
-| version | String | ✅ | 분석 알고리즘 버전 (예: "1.0.0") |
-| ttl | Number | ✅ | TTL (Unix timestamp, 초 단위) |
+| 속성           | 타입   | 필수 | 설명                                   |
+| -------------- | ------ | ---- | -------------------------------------- |
+| cacheKey       | String | ✅   | 캐시 키 (productName + version의 해시) |
+| productName    | String | ✅   | 제품명                                 |
+| analysisResult | Object | ✅   | 분석 결과 (ProductAnalysisResult)      |
+| createdAt      | String | ✅   | 생성 시간 (ISO 8601)                   |
+| expiresAt      | String | ✅   | 만료 시간 (ISO 8601, 24시간 후)        |
+| hitCount       | Number | ✅   | 캐시 히트 횟수                         |
+| lastAccessedAt | String | ✅   | 마지막 접근 시간 (ISO 8601)            |
+| version        | String | ✅   | 분석 알고리즘 버전 (예: "1.0.0")       |
+| ttl            | Number | ✅   | TTL (Unix timestamp, 초 단위)          |
 
 #### 데이터 예시
 
@@ -188,9 +200,15 @@ Perplexity API 호출 이력을 저장합니다. 각 세션은 여러 검색 이
   "analysisResult": {
     "sessionId": "550e8400-e29b-41d4-a716-446655440000",
     "productName": "삼성 갤럭시 버즈2 프로",
-    "summary": { /* ... */ },
-    "priceComparison": { /* ... */ },
-    "reviewDigest": { /* ... */ },
+    "summary": {
+      /* ... */
+    },
+    "priceComparison": {
+      /* ... */
+    },
+    "reviewDigest": {
+      /* ... */
+    },
     "riskScore": {
       "score": 25,
       "level": "LOW",
@@ -234,11 +252,11 @@ DynamoDB의 TTL(Time To Live) 기능을 사용하여 오래된 데이터를 자�
 
 ### TTL 정책
 
-| 테이블 | TTL 기간 | 용도 |
-|--------|----------|------|
-| SearchSessions | 30일 | 세션 데이터는 통계 분석 후 삭제 |
-| SearchHistory | 90일 | 검색 이력은 더 긴 기간 보관 |
-| AnalysisCache | 24시간 | 캐시는 짧은 기간 유지 |
+| 테이블         | TTL 기간 | 용도                            |
+| -------------- | -------- | ------------------------------- |
+| SearchSessions | 30일     | 세션 데이터는 통계 분석 후 삭제 |
+| SearchHistory  | 90일     | 검색 이력은 더 긴 기간 보관     |
+| AnalysisCache  | 24시간   | 캐시는 짧은 기간 유지           |
 
 ### TTL 계산 예시
 
@@ -260,6 +278,7 @@ const ttl24Hours = Math.floor(Date.now() / 1000) + 24 * 60 * 60;
 ### ProductNameIndex (SearchSessions)
 
 **사용 사례**: 특정 제품에 대한 모든 분석 세션 조회
+
 - 제품 인기도 분석
 - 사용자들이 많이 검색하는 제품 파악
 - 제품별 분석 추이 확인
@@ -267,6 +286,7 @@ const ttl24Hours = Math.floor(Date.now() / 1000) + 24 * 60 * 60;
 ### SessionIndex (SearchHistory)
 
 **사용 사례**: 특정 세션의 모든 검색 이력 조회
+
 - 세션 디버깅
 - 사용자 행동 분석
 - 검색 과정 추적
@@ -274,6 +294,7 @@ const ttl24Hours = Math.floor(Date.now() / 1000) + 24 * 60 * 60;
 ### SearchTypeIndex (SearchHistory)
 
 **사용 사례**: 검색 타입별 통계 및 분석
+
 - API 사용량 모니터링 (타입별)
 - 성능 최적화 대상 파악
 - 비용 분석
@@ -281,6 +302,7 @@ const ttl24Hours = Math.floor(Date.now() / 1000) + 24 * 60 * 60;
 ### ExpiresAtIndex (AnalysisCache)
 
 **사용 사례**: 만료된 캐시 항목 정리
+
 - 배치 작업을 통한 주기적 정리
 - 스토리지 비용 절감
 
@@ -344,6 +366,7 @@ const ttl24Hours = Math.floor(Date.now() / 1000) + 24 * 60 * 60;
 현재 설계는 **On-Demand** 방식을 권장합니다.
 
 **이유**:
+
 - 트래픽이 예측 불가능
 - 초기 단계에서는 사용량이 적음
 - 스파이크 트래픽 대응 필요

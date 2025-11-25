@@ -125,7 +125,9 @@ Content-Type: application/json
     },
     "priceComparison": {
       "productName": "삼성 갤럭시 버즈2 프로",
-      "prices": [/* ... */],
+      "prices": [
+        /* ... */
+      ],
       "statistics": {
         "average": 190380,
         "median": 185000,
@@ -133,20 +135,30 @@ Content-Type: application/json
         "max": 229000,
         "stdDev": 22145
       },
-      "outliers": [/* ... */]
+      "outliers": [
+        /* ... */
+      ]
     },
     "reviewDigest": {
       "productName": "삼성 갤럭시 버즈2 프로",
       "overallSentiment": "positive",
       "sentimentScore": 78,
-      "commonPraises": [/* ... */],
-      "commonComplaints": [/* ... */],
-      "keyInsights": [/* ... */]
+      "commonPraises": [
+        /* ... */
+      ],
+      "commonComplaints": [
+        /* ... */
+      ],
+      "keyInsights": [
+        /* ... */
+      ]
     },
     "riskScore": {
       "score": 25,
       "level": "LOW",
-      "factors": [/* ... */],
+      "factors": [
+        /* ... */
+      ],
       "recommendation": "안전한 구매로 판단됩니다."
     },
     "analyzedAt": "2025-11-22T10:30:15.000Z",
@@ -183,9 +195,9 @@ GET /api/alternatives?productName=삼성%20갤럭시%20버즈2%20프로
 
 #### Query Parameters
 
-| 파라미터 | 타입 | 필수 | 설명 |
-|---------|------|------|------|
-| productName | string | ✅ | 검색할 제품명 |
+| 파라미터    | 타입   | 필수 | 설명          |
+| ----------- | ------ | ---- | ------------- |
+| productName | string | ✅   | 검색할 제품명 |
 
 #### Response
 
@@ -362,10 +374,7 @@ class ProductAnalysisService {
   /**
    * 제품 분석 수행
    */
-  async analyzeProduct(
-    productName: string,
-    productUrl?: string
-  ): Promise<ProductAnalysisResult> {
+  async analyzeProduct(productName: string, productUrl?: string): Promise<ProductAnalysisResult> {
     // 1. 세션 생성
     const session = await this.createSession(productName, productUrl);
 
@@ -420,10 +429,7 @@ class ProductAnalysisService {
   /**
    * 세션 생성
    */
-  private async createSession(
-    productName: string,
-    productUrl?: string
-  ): Promise<SearchSession> {
+  private async createSession(productName: string, productUrl?: string): Promise<SearchSession> {
     const session: SearchSession = {
       sessionId: generateUUID(),
       createdAt: new Date().toISOString(),
@@ -441,10 +447,7 @@ class ProductAnalysisService {
   /**
    * 세션 업데이트 (완료)
    */
-  private async updateSession(
-    sessionId: string,
-    result: ProductAnalysisResult
-  ): Promise<void> {
+  private async updateSession(sessionId: string, result: ProductAnalysisResult): Promise<void> {
     await this.dbClient.updateItem('SearchSessions', sessionId, {
       status: 'completed',
       analysisResult: result,
@@ -455,10 +458,7 @@ class ProductAnalysisService {
   /**
    * 세션 업데이트 (실패)
    */
-  private async failSession(
-    sessionId: string,
-    error: Error
-  ): Promise<void> {
+  private async failSession(sessionId: string, error: Error): Promise<void> {
     await this.dbClient.updateItem('SearchSessions', sessionId, {
       status: 'failed',
       errorMessage: error.message,
@@ -507,9 +507,7 @@ class RiskAnalyzer {
 
     // 5. 종합 점수 계산 (가중 평균)
     const score = Math.round(
-      priceFactor.impact * 0.4 +
-      sellerFactor.impact * 0.3 +
-      reviewFactor.impact * 0.3
+      priceFactor.impact * 0.4 + sellerFactor.impact * 0.3 + reviewFactor.impact * 0.3
     );
 
     // 6. 위험 수준 분류
@@ -566,9 +564,7 @@ class RiskAnalyzer {
     // 신뢰도 높은 플랫폼 목록
     const trustedPlatforms = ['쿠팡', '네이버쇼핑', '11번가', 'G마켓'];
 
-    const trustedCount = popularPlatforms.filter(p =>
-      trustedPlatforms.includes(p)
-    ).length;
+    const trustedCount = popularPlatforms.filter(p => trustedPlatforms.includes(p)).length;
 
     let severity: 'LOW' | 'MEDIUM' | 'HIGH';
     let impact: number;
@@ -633,16 +629,11 @@ class RiskAnalyzer {
   /**
    * 추천 메시지 생성
    */
-  private generateRecommendation(
-    level: 'LOW' | 'MEDIUM' | 'HIGH',
-    factors: RiskFactor[]
-  ): string {
+  private generateRecommendation(level: 'LOW' | 'MEDIUM' | 'HIGH', factors: RiskFactor[]): string {
     if (level === 'LOW') {
       return '안전한 구매로 판단됩니다. 공식 판매처 또는 신뢰도 높은 판매자를 통해 구매하시면 됩니다.';
     } else if (level === 'MEDIUM') {
-      const warnings = factors
-        .filter(f => f.severity !== 'LOW')
-        .map(f => f.description);
+      const warnings = factors.filter(f => f.severity !== 'LOW').map(f => f.description);
       return `주의가 필요합니다. ${warnings.join(', ')}. 여러 플랫폼을 비교한 후 구매를 결정하세요.`;
     } else {
       return '높은 위험도가 감지되었습니다. 구매를 재고하시거나, 신뢰할 수 있는 판매처를 통해 구매하시기 바랍니다.';
@@ -777,12 +768,7 @@ export class DatabaseError extends ApiError {
 ### 전역 에러 핸들러
 
 ```typescript
-export const errorHandler = (
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const errorHandler = (err: Error, req: Request, res: Response, next: NextFunction) => {
   logger.error('Error occurred', {
     error: err.message,
     stack: err.stack,
@@ -860,10 +846,7 @@ export const logger = winston.createLogger({
   ),
   transports: [
     new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple()
-      ),
+      format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
     }),
     new winston.transports.File({
       filename: 'logs/error.log',
@@ -885,14 +868,16 @@ export const logger = winston.createLogger({
 ```typescript
 import helmet from 'helmet';
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+      },
     },
-  },
-}));
+  })
+);
 ```
 
 ### 2. CORS

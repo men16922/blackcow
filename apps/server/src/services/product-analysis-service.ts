@@ -37,10 +37,7 @@ export class ProductAnalysisService {
   /**
    * 제품 분석 수행
    */
-  async analyzeProduct(
-    productName: string,
-    productUrl?: string
-  ): Promise<ProductAnalysisResult> {
+  async analyzeProduct(productName: string, productUrl?: string): Promise<ProductAnalysisResult> {
     const startTime = Date.now();
 
     logger.info('제품 분석 시작', { productName, productUrl });
@@ -177,11 +174,15 @@ export class ProductAnalysisService {
     if (!this.dbClient) return;
 
     try {
-      await this.dbClient.updateItem('SearchSessions', { sessionId }, {
-        status: 'completed',
-        analysisResult: result,
-        updatedAt: getCurrentTimestamp(),
-      });
+      await this.dbClient.updateItem(
+        'SearchSessions',
+        { sessionId },
+        {
+          status: 'completed',
+          analysisResult: result,
+          updatedAt: getCurrentTimestamp(),
+        }
+      );
 
       logger.info('세션 업데이트 완료 (캐시)', { sessionId });
     } catch (error) {
@@ -192,25 +193,24 @@ export class ProductAnalysisService {
   /**
    * 분석 완료 처리
    */
-  private async finalizeAnalysis(
-    sessionId: string,
-    result: ProductAnalysisResult
-  ): Promise<void> {
+  private async finalizeAnalysis(sessionId: string, result: ProductAnalysisResult): Promise<void> {
     const promises: Promise<unknown>[] = [];
 
     // 세션 업데이트
     if (this.dbClient) {
       promises.push(
         this.dbClient
-          .updateItem('SearchSessions', { sessionId }, {
-            status: 'completed',
-            analysisResult: result,
-            updatedAt: getCurrentTimestamp(),
-          })
-          .then(() => logger.info('세션 업데이트 완료', { sessionId }))
-          .catch((error: Error) =>
-            logger.error('세션 업데이트 실패', { sessionId, error })
+          .updateItem(
+            'SearchSessions',
+            { sessionId },
+            {
+              status: 'completed',
+              analysisResult: result,
+              updatedAt: getCurrentTimestamp(),
+            }
           )
+          .then(() => logger.info('세션 업데이트 완료', { sessionId }))
+          .catch((error: Error) => logger.error('세션 업데이트 실패', { sessionId, error }))
       );
     }
 
@@ -236,16 +236,19 @@ export class ProductAnalysisService {
     if (!this.dbClient) return;
 
     try {
-      await this.dbClient.updateItem('SearchSessions', { sessionId }, {
-        status: 'failed',
-        errorMessage: error.message,
-        updatedAt: getCurrentTimestamp(),
-      });
+      await this.dbClient.updateItem(
+        'SearchSessions',
+        { sessionId },
+        {
+          status: 'failed',
+          errorMessage: error.message,
+          updatedAt: getCurrentTimestamp(),
+        }
+      );
 
       logger.info('세션 실패 처리 완료', { sessionId });
     } catch (err) {
       logger.error('세션 실패 처리 실패', { sessionId, error: err });
     }
   }
-
 }
